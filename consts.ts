@@ -1,0 +1,7 @@
+export const CATEGORY = {
+  SELFIE: "SELFIE",
+  PORTRAIT: "PORTRAIT",
+  ACTION: "ACTION",
+  LANDSCAPE: "LANDSCAPE",
+  GRAPHIC: "GRAPHIC",
+} as const;
