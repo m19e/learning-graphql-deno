@@ -57,11 +57,17 @@ const yoga = createYoga({
         },
       },
       Photo: {
-        url: (parent: Photo) => `https://mysite.com/assets/img/${parent.id}.png`,
-        postedBy: (parent: Photo) => users.find((u) => u.githubLogin === parent.githubUser),
+        url: (parent: Photo) => {
+          return `https://mysite.com/assets/img/${parent.id}.png`;
+        },
+        postedBy: (parent: Photo) => {
+          return users.find((u) => u.githubLogin === parent.githubUser);
+        },
       },
       User: {
-        postedPhotos: (parent: User) => photos.filter((p) => p.githubUser === parent.githubLogin),
+        postedPhotos: (parent: User) => {
+          return photos.filter((p) => p.githubUser === parent.githubLogin);
+        },
       },
     },
   }),
