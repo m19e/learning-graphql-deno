@@ -35,7 +35,6 @@ const yoga = createYoga({
       type Query {
         totalPhotos: Int!
         allPhotos: [Photo!]!
-        hello: String!
       }
       type Mutation {
         postPhoto(input: PostPhotoInput): Photo!
