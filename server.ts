@@ -1,7 +1,7 @@
 import { createSchema, createYoga, serve } from "./deps.ts";
 
 import type { Photo, PhotoInput, User } from "./types.ts";
-import { photos, users } from "./mocks.ts";
+import { photos, tags, users } from "./mocks.ts";
 
 const yoga = createYoga({
   schema: createSchema({
@@ -20,6 +20,7 @@ const yoga = createYoga({
         description: String
         category: PhotoCategory!
         postedBy: User!
+        taggedUsers: [User!]!
       }
       input PostPhotoInput {
         name: String!
@@ -62,6 +63,11 @@ const yoga = createYoga({
         },
         postedBy: (parent: Photo) => {
           return users.find((u) => u.githubLogin === parent.githubUser);
+        },
+        taggedUsers: (parent: Photo) => {
+          return tags.filter((tag) => tag.photoID === parent.id).map((
+            { userID },
+          ) => users.find((u) => u.githubLogin === userID));
         },
       },
       User: {
