@@ -1,4 +1,4 @@
-import type { Photo, User } from "./types.ts";
+import type { Photo, Tag, User } from "./types.ts";
 
 export const users: User[] = [
   {
@@ -45,4 +45,10 @@ export const photos: Photo[] = [
     category: "PORTRAIT",
     githubUser: "yHayase",
   },
+];
+
+export const tags: Tag[] = [
+  { photoID: "1", userID: "rTsukatsuki" },
+  { photoID: "2", userID: "yHayase" },
+  { photoID: "3", userID: "nUshio" },
 ];
