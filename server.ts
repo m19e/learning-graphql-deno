@@ -3,45 +3,11 @@ import { createSchema, createYoga, serve } from "./deps.ts";
 import type { Photo, PhotoInput, User } from "./types.ts";
 import { photos, tags, users } from "./mocks.ts";
 
+const typeDefs = await Deno.readTextFile("./typeDefs.graphql");
+
 const yoga = createYoga({
   schema: createSchema({
-    typeDefs: /* GraphQL */ `
-      enum PhotoCategory {
-        SELFIE
-        PORTRAIT
-        ACTION
-        LANDSCAPE
-        GRAPHIC
-      }
-      type Photo {
-        id: ID!
-        url: String!
-        name: String!
-        description: String
-        category: PhotoCategory!
-        postedBy: User!
-        taggedUsers: [User!]!
-      }
-      input PostPhotoInput {
-        name: String!
-        category: PhotoCategory = PORTRAIT
-        description: String
-      }
-      type User {
-        githubLogin: ID!
-        name: String
-        avatar: String
-        postedPhotos: [Photo!]!
-        inPhotos: [Photo!]!
-      }
-      type Query {
-        totalPhotos: Int!
-        allPhotos: [Photo!]!
-      }
-      type Mutation {
-        postPhoto(input: PostPhotoInput): Photo!
-      }
-    `,
+    typeDefs,
     resolvers: {
       Query: {
         totalPhotos: () => photos.length,
