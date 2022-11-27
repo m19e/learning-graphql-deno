@@ -13,12 +13,6 @@ const yoga = createYoga({
         LANDSCAPE
         GRAPHIC
       }
-      type User {
-        githubLogin: ID!
-        name: String
-        avatar: String
-        postedPhotos: [Photo!]!
-      }
       type Photo {
         id: ID!
         url: String!
@@ -31,6 +25,13 @@ const yoga = createYoga({
         name: String!
         category: PhotoCategory = PORTRAIT
         description: String
+      }
+      type User {
+        githubLogin: ID!
+        name: String
+        avatar: String
+        postedPhotos: [Photo!]!
+        inPhotos: [Photo!]!
       }
       type Query {
         totalPhotos: Int!
