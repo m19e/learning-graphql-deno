@@ -68,6 +68,11 @@ const yoga = createYoga({
         postedPhotos: (parent: User) => {
           return photos.filter((p) => p.githubUser === parent.githubLogin);
         },
+        inPhotos: (parent: User) => {
+          return tags.filter((tag) => tag.userID === parent.githubLogin).map((
+            { photoID },
+          ) => photos.find((p) => p.id === photoID));
+        },
       },
     },
   }),
