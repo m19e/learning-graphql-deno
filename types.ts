@@ -21,3 +21,8 @@ export type User = {
   avatar?: string;
   postedPhotos: Photo[];
 };
+
+export type Tag = {
+  photoID: string;
+  userID: string;
+};
