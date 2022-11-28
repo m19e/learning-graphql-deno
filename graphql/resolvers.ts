@@ -1,3 +1,5 @@
+import { GraphQLScalarType } from "../deps.ts";
+
 import type { Photo, PhotoInput, User } from "../types.ts";
 import { photos, tags, users } from "../mocks.ts";
 
@@ -18,6 +20,7 @@ type Resolvers = {
   Mutation: {
     postPhoto: (_: null, args: PhotoInput) => Photo;
   };
+  DateTime: GraphQLScalarType;
 };
 
 export const resolvers: Resolvers = {
@@ -58,4 +61,11 @@ export const resolvers: Resolvers = {
       return newPhoto;
     },
   },
+  DateTime: new GraphQLScalarType({
+    name: "DateTime",
+    description: "A valid date time value.",
+    parseValue: (value: string) => new Date(value),
+    serialize: (value: string) => new Date(value).toISOString(),
+    parseLiteral: (ast: { value: string }) => ast.value,
+  }),
 };
