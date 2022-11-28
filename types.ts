@@ -9,6 +9,7 @@ export type Photo = {
   desciption?: string;
   category: PhotoCategory;
   githubUser: string;
+  created: string;
 };
 
 export type PhotoInput = {

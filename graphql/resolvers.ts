@@ -56,6 +56,7 @@ export const resolvers: Resolvers = {
       const newPhoto: Photo = {
         ...args.input,
         id: crypto.randomUUID(),
+        created: new Date().toISOString(),
       };
       photos.push(newPhoto);
       return newPhoto;

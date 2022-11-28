@@ -30,6 +30,7 @@ export const photos: Photo[] = [
     desciption: "photo/1 description",
     category: "PORTRAIT",
     githubUser: "hAkeboshi",
+    created: "11-23-2032",
   },
   {
     id: "2",
@@ -37,6 +38,7 @@ export const photos: Photo[] = [
     desciption: "photo/2 description",
     category: "SELFIE",
     githubUser: "nUshio",
+    created: "11-25-2032",
   },
   {
     id: "3",
@@ -44,6 +46,7 @@ export const photos: Photo[] = [
     desciption: "photo/3 description",
     category: "PORTRAIT",
     githubUser: "yHayase",
+    created: "11-26-2032",
   },
 ];
 
