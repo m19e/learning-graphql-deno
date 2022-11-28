@@ -3,7 +3,7 @@ import { createSchema, createYoga, serve } from "./deps.ts";
 import type { Photo, PhotoInput, User } from "./types.ts";
 import { photos, tags, users } from "./mocks.ts";
 
-const typeDefs = await Deno.readTextFile("./typeDefs.graphql");
+const typeDefs = await Deno.readTextFile("./graphql/typeDefs.graphql");
 
 const yoga = createYoga({
   schema: createSchema({
