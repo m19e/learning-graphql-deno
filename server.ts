@@ -1,18 +1,45 @@
-import { createSchema, createYoga, serve } from "./deps.ts";
+import { Application, applyGraphQL, Router } from "./deps.ts";
 
 import { resolvers } from "./graphql/resolvers.ts";
 
 const typeDefs = await Deno.readTextFile("./graphql/typeDefs.graphql");
 
-const yoga = createYoga({
-  schema: createSchema({
-    typeDefs,
-    resolvers,
-  }),
+const app = new Application();
+
+app.use(async (ctx, next) => {
+  await next();
+  const rt = ctx.response.headers.get("X-Response-Time");
+  console.log(`${ctx.request.method} ${ctx.request.url} - ${rt}`);
 });
 
-serve(yoga, {
-  onListen({ hostname, port }) {
-    console.log(`Listening on http://${hostname}:${port}/graphql`);
-  },
+app.use(async (ctx, next) => {
+  const start = Date.now();
+  await next();
+  const ms = Date.now() - start;
+  ctx.response.headers.set("X-Response-Time", `${ms}ms`);
 });
+
+const router = new Router().get(
+  "/",
+  ({ response }) => response.body = "Welcome to the PhotoShare API",
+);
+
+const GraphQLService = await applyGraphQL<Router>({
+  Router,
+  typeDefs,
+  resolvers,
+  context: (_ctx) => {
+    // this line is for passing a user context for the auth
+    return { user: "Aaron" };
+  },
+  path: "/playground",
+});
+
+app.use(
+  router.routes(),
+  GraphQLService.routes(),
+  GraphQLService.allowedMethods(),
+);
+
+console.log("Server start at http://localhost:4000");
+await app.listen({ port: 4000 });
