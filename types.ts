@@ -9,6 +9,7 @@ export type Photo = {
   desciption?: string;
   category: PhotoCategory;
   githubUser: string;
+  created: string;
 };
 
 export type PhotoInput = {
@@ -20,4 +21,9 @@ export type User = {
   name?: string;
   avatar?: string;
   postedPhotos: Photo[];
+};
+
+export type Tag = {
+  photoID: string;
+  userID: string;
 };
