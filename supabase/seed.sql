@@ -1,5 +1,6 @@
 insert into public.employees (name)
 values
-  ('Erlich Backman'),
-  ('Richard Hendricks'),
-  ('Monica Hall');
+  ('Rio Tsukatsuki'),
+  ('Himari Akeboshi'),
+  ('Yuuka Hayase'),
+  ('Noa Ushio');
