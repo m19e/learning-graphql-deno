@@ -16,6 +16,8 @@ type Resolvers = {
   Query: {
     totalPhotos: () => number;
     allPhotos: () => Photo[];
+    totalUsers: () => number;
+    allUsers: () => User[];
   };
   Mutation: {
     postPhoto: (_: null, args: PhotoInput) => Photo;
@@ -50,6 +52,8 @@ export const resolvers: Resolvers = {
   Query: {
     totalPhotos: () => photos.length,
     allPhotos: () => photos,
+    totalUsers: () => users.length,
+    allUsers: () => users,
   },
   Mutation: {
     postPhoto: (_: null, args: PhotoInput): Photo => {
