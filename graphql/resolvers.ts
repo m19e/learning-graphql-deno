@@ -17,7 +17,7 @@ type Resolvers = {
     totalPhotos: () => number;
     allPhotos: () => Photo[];
     totalUsers: () => number;
-    allUsers: () => User[];
+    allUsers: () => User[] | Promise<User[]>;
   };
   Mutation: {
     postPhoto: (_: null, args: PhotoInput) => Photo;
@@ -38,12 +38,14 @@ query {
   }
 }
 `;
+
+type ResponseError = { errors: { message: string }[]; data: undefined };
 type Response = {
   data: {
     employeesCollection: { edges: { node: { id: number; name: string } }[] };
   };
   errors: undefined;
-} | { errors: { message: string }[]; data: undefined };
+} | ResponseError;
 
 export const resolvers: Resolvers = {
   Photo: {
@@ -73,26 +75,28 @@ export const resolvers: Resolvers = {
     totalPhotos: () => photos.length,
     allPhotos: () => photos,
     totalUsers: () => users.length,
-    allUsers: () => {
-      (async () => {
-        const { data } = await ky.post(endpoint, {
-          headers: {
-            Authentication:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0",
-            apiKey:
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0",
-          },
-          json: { query },
-        }).json<Response>();
-        if (data) {
-          const userList = data.employeesCollection.edges.map(({ node }) => ({
-            githubLogin: node.id,
-            name: node.name,
-          }));
-          console.log(userList);
-        }
-      })();
-      return users;
+    allUsers: async () => {
+      const { data, errors } = await ky.post(endpoint, {
+        headers: {
+          Authentication:
+            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0",
+          apiKey:
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0",
+        },
+        json: { query },
+      }).json<Response>();
+      if (errors) {
+        return [];
+      }
+      const userList: User[] = data.employeesCollection.edges.map((
+        { node },
+      ) => ({
+        githubLogin: `${node.id}`,
+        name: node.name,
+        postedPhotos: [],
+      }));
+      console.log(userList);
+      return userList;
     },
   },
   Mutation: {
