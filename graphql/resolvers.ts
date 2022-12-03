@@ -1,4 +1,4 @@
-import { GraphQLScalarType } from "../deps.ts";
+import { GraphQLScalarType, ky } from "../deps.ts";
 
 import type { Photo, PhotoInput, User } from "../types.ts";
 import { photos, tags, users } from "../mocks.ts";
@@ -24,6 +24,26 @@ type Resolvers = {
   };
   DateTime: GraphQLScalarType;
 };
+
+const endpoint = "http://localhost:54321/graphql/v1";
+const query = /* GraphQL */ `
+query {
+  employeesCollection {
+    edges {
+      node {
+        id
+        name
+      }
+    }
+  }
+}
+`;
+type Response = {
+  data: {
+    employeesCollection: { edges: { node: { id: number; name: string } }[] };
+  };
+  errors: undefined;
+} | { errors: { message: string }[]; data: undefined };
 
 export const resolvers: Resolvers = {
   Photo: {
@@ -53,7 +73,27 @@ export const resolvers: Resolvers = {
     totalPhotos: () => photos.length,
     allPhotos: () => photos,
     totalUsers: () => users.length,
-    allUsers: () => users,
+    allUsers: () => {
+      (async () => {
+        const { data } = await ky.post(endpoint, {
+          headers: {
+            Authentication:
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0",
+            apiKey:
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0",
+          },
+          json: { query },
+        }).json<Response>();
+        if (data) {
+          const userList = data.employeesCollection.edges.map(({ node }) => ({
+            githubLogin: node.id,
+            name: node.name,
+          }));
+          console.log(userList);
+        }
+      })();
+      return users;
+    },
   },
   Mutation: {
     postPhoto: (_: null, args: PhotoInput): Photo => {

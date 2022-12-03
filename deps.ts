@@ -1,3 +1,5 @@
+import ky from "https://esm.sh/ky@0.32.2";
+export { ky };
 export { Application, Router } from "https://deno.land/x/oak@v10.0.0/mod.ts";
 export {
   applyGraphQL,
