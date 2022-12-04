@@ -34,11 +34,12 @@ const headers = {
 };
 const allUsersQuery = /* GraphQL */ `
 query {
-  employeesCollection {
+  usersCollection {
     edges {
       node {
         id
         name
+        github_login
       }
     }
   }
@@ -48,7 +49,9 @@ query {
 type ResponseError = { errors: { message: string }[]; data: undefined };
 type Response = {
   data: {
-    employeesCollection: { edges: { node: { id: number; name: string } }[] };
+    usersCollection: {
+      edges: { node: { id: number; name: string; github_login: string } }[];
+    };
   };
   errors: undefined;
 } | ResponseError;
@@ -88,16 +91,16 @@ export const resolvers: Resolvers = {
       }).json<Response>();
 
       if (errors) {
+        console.log(errors);
         return [];
       }
-      const userList: User[] = data.employeesCollection.edges.map((
+      const userList: User[] = data.usersCollection.edges.map((
         { node },
       ) => ({
-        githubLogin: `${node.id}`,
+        githubLogin: node.github_login,
         name: node.name,
         postedPhotos: [],
       }));
-      console.log(userList);
       return userList;
     },
   },
