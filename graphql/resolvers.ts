@@ -57,6 +57,13 @@ type Response = {
   errors: undefined;
 } | ResponseError;
 
+const fetchAllUsersData = async (): Promise<Response> => {
+  return await ky.post(endpoint, {
+    headers,
+    json: { query: allUsersQuery },
+  }).json<Response>();
+};
+
 export const resolvers: Resolvers = {
   Photo: {
     url: (parent: Photo) => {
@@ -86,11 +93,7 @@ export const resolvers: Resolvers = {
     allPhotos: () => photos,
     totalUsers: () => users.length,
     allUsers: async () => {
-      const { data, errors } = await ky.post(endpoint, {
-        headers,
-        json: { query: allUsersQuery },
-      }).json<Response>();
-
+      const { data, errors } = await fetchAllUsersData();
       if (errors) {
         console.log(errors);
         return [];
