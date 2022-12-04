@@ -1,6 +1,6 @@
-insert into public.employees (name)
+insert into public.users (name, github_login)
 values
-  ('Rio Tsukatsuki'),
-  ('Himari Akeboshi'),
-  ('Yuuka Hayase'),
-  ('Noa Ushio');
+  ('Rio Tsukatsuki', 'rTsukatsuki'),
+  ('Himari Akeboshi', 'hAkeboshi'),
+  ('Yuuka Hayase', 'yHayase'),
+  ('Noa Ushio', 'nUshio');
