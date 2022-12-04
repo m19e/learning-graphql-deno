@@ -32,7 +32,7 @@ const headers = {
   apiKey:
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0",
 };
-const query = /* GraphQL */ `
+const allUsersQuery = /* GraphQL */ `
 query {
   employeesCollection {
     edges {
@@ -84,7 +84,7 @@ export const resolvers: Resolvers = {
     allUsers: async () => {
       const { data, errors } = await ky.post(endpoint, {
         headers,
-        json: { query },
+        json: { query: allUsersQuery },
       }).json<Response>();
 
       if (errors) {
