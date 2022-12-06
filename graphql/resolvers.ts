@@ -19,7 +19,7 @@ type Resolvers = {
   Query: {
     totalPhotos: () => number;
     allPhotos: () => Photo[];
-    totalUsers: () => number;
+    totalUsers: () => Promise<number>;
     allUsers: () => User[] | Promise<User[]>;
   };
   Mutation: {
@@ -91,7 +91,16 @@ export const resolvers: Resolvers = {
   Query: {
     totalPhotos: () => photos.length,
     allPhotos: () => photos,
-    totalUsers: () => users.length,
+    totalUsers: async () => {
+      const { data, errors } = await fetchAllUsersData();
+      if (errors) {
+        console.log(errors);
+        return 0;
+      }
+      const { edges } = data.usersCollection;
+      console.log(edges.map(({ node }) => node));
+      return edges.length;
+    },
     allUsers: async () => {
       const { data, errors } = await fetchAllUsersData();
       if (errors) {
