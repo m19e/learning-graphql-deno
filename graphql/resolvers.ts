@@ -47,21 +47,28 @@ query {
 }
 `;
 
+type Collection<T> = {
+  edges: { node: T }[];
+};
+
+type UserNode = { id: number; name: string; github_login: string };
+type UsersCollection = Collection<UserNode>;
+type UsersData = {
+  usersCollection: UsersCollection;
+};
+
 type ResponseError = { errors: { message: string }[]; data: undefined };
-type Response = {
-  data: {
-    usersCollection: {
-      edges: { node: { id: number; name: string; github_login: string } }[];
-    };
-  };
+type Response<T> = {
+  data: T;
   errors: undefined;
 } | ResponseError;
 
-const fetchAllUsersData = async (): Promise<Response> => {
+type UsersResponse = Response<UsersData>;
+const fetchAllUsersData = async (): Promise<UsersResponse> => {
   return await ky.post(endpoint, {
     headers,
     json: { query: allUsersQuery },
-  }).json<Response>();
+  }).json<UsersResponse>();
 };
 
 export const resolvers: Resolvers = {
