@@ -46,6 +46,22 @@ query {
   }
 }
 `;
+const allPhotosQuery = /* GraphQL */ `
+{
+  photosCollection {
+    edges {
+      node {
+        id
+        name
+        description
+        category
+        created
+        github_user
+      }
+    }
+  }
+}
+`;
 
 type Collection<T> = {
   edges: { node: T }[];
