@@ -1,7 +1,10 @@
-import { GraphQLScalarType } from "../deps.ts";
+import { GraphQLScalarType, ky } from "../deps.ts";
 
 import type { Photo, PhotoInput, User } from "../types.ts";
 import { photos, tags, users } from "../mocks.ts";
+
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0";
 
 type Resolvers = {
   Photo: {
@@ -16,11 +19,56 @@ type Resolvers = {
   Query: {
     totalPhotos: () => number;
     allPhotos: () => Photo[];
+    totalUsers: () => Promise<number>;
+    allUsers: () => User[] | Promise<User[]>;
   };
   Mutation: {
     postPhoto: (_: null, args: PhotoInput) => Photo;
   };
   DateTime: GraphQLScalarType;
+};
+
+const endpoint = "http://localhost:54321/graphql/v1";
+const headers = {
+  Authentication: `Bearer ${SUPABASE_ANON_KEY}`,
+  apiKey: SUPABASE_ANON_KEY,
+};
+const allUsersQuery = /* GraphQL */ `
+query {
+  usersCollection {
+    edges {
+      node {
+        id
+        name
+        github_login
+      }
+    }
+  }
+}
+`;
+
+type Collection<T> = {
+  edges: { node: T }[];
+};
+
+type UserNode = { id: number; name: string; github_login: string };
+type UsersCollection = Collection<UserNode>;
+type UsersData = {
+  usersCollection: UsersCollection;
+};
+
+type ResponseError = { errors: { message: string }[]; data: undefined };
+type Response<T> = {
+  data: T;
+  errors: undefined;
+} | ResponseError;
+
+type UsersResponse = Response<UsersData>;
+const fetchAllUsersData = async (): Promise<UsersResponse> => {
+  return await ky.post(endpoint, {
+    headers,
+    json: { query: allUsersQuery },
+  }).json<UsersResponse>();
 };
 
 export const resolvers: Resolvers = {
@@ -50,6 +98,31 @@ export const resolvers: Resolvers = {
   Query: {
     totalPhotos: () => photos.length,
     allPhotos: () => photos,
+    totalUsers: async () => {
+      const { data, errors } = await fetchAllUsersData();
+      if (errors) {
+        console.log(errors);
+        return 0;
+      }
+      const { edges } = data.usersCollection;
+      console.log(edges.map(({ node }) => node));
+      return edges.length;
+    },
+    allUsers: async () => {
+      const { data, errors } = await fetchAllUsersData();
+      if (errors) {
+        console.log(errors);
+        return [];
+      }
+      const userList: User[] = data.usersCollection.edges.map((
+        { node },
+      ) => ({
+        githubLogin: node.github_login,
+        name: node.name,
+        postedPhotos: [],
+      }));
+      return userList;
+    },
   },
   Mutation: {
     postPhoto: (_: null, args: PhotoInput): Photo => {

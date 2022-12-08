@@ -1,13 +1,9 @@
-export { Hono } from "https://deno.land/x/hono/mod.ts";
-export { graphqlServer } from "npm:@honojs/graphql-server";
-export { buildSchema } from "https://cdn.skypack.dev/graphql";
-export { serve } from "https://deno.land/std@0.157.0/http/server.ts";
-export { createSchema, createYoga } from "https://cdn.skypack.dev/graphql-yoga";
-
+import ky from "https://esm.sh/ky@0.32.2";
+export { ky };
 export { Application, Router } from "https://deno.land/x/oak@v10.0.0/mod.ts";
 export {
   applyGraphQL,
   gql,
   GQLError,
-} from "https://deno.land/x/oak_graphql/mod.ts";
+} from "https://deno.land/x/oak_graphql@0.6.4/mod.ts";
 export { GraphQLScalarType } from "https://cdn.skypack.dev/graphql";
