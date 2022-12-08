@@ -5,13 +5,12 @@
 --   'LANDSCAPE',
 --   'GRAPHIC'
 -- );
-
 -- create table public.photos (
 --     id integer primary key generated always as identity,
---     url text not null,
 --     name text not null,
 --     description text,
---     category category
+--     category category,
+--     github_user text not null,
 --     created date
 -- );
 
