@@ -1,5 +1,6 @@
 !.vim
 !.env.example
+.env.development
 *.log
 cov_profile
 deno.lock
