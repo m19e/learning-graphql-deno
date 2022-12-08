@@ -67,7 +67,11 @@ type Collection<T> = {
   edges: { node: T }[];
 };
 
-type UserNode = { id: number; name: string; github_login: string };
+type UserNode = {
+  id: number;
+  name: string;
+  github_login: string;
+};
 type UsersCollection = Collection<UserNode>;
 type UsersData = {
   usersCollection: UsersCollection;
@@ -92,20 +96,20 @@ type Response<T> = {
   errors: undefined;
 } | ResponseError;
 
-type UsersResponse = Response<UsersData>;
-const fetchAllUsers = async (): Promise<UsersResponse> => {
+const postWithHeaders = async <T>(query: string): Promise<T> => {
   return await ky.post(endpoint, {
     headers,
-    json: { query: allUsersQuery },
-  }).json<UsersResponse>();
+    json: { query },
+  }).json<T>();
 };
 
+type UsersResponse = Response<UsersData>;
+const fetchAllUsers = async (): Promise<UsersResponse> => {
+  return await postWithHeaders<UsersResponse>(allUsersQuery);
+};
 type PhotosResponse = Response<PhotosData>;
 const fetchAllPhotos = async (): Promise<PhotosResponse> => {
-  return await ky.post(endpoint, {
-    headers,
-    json: { query: allPhotosQuery },
-  }).json<PhotosResponse>();
+  return await postWithHeaders<PhotosResponse>(allPhotosQuery);
 };
 
 export const resolvers: Resolvers = {
@@ -149,7 +153,6 @@ export const resolvers: Resolvers = {
           ...other,
         };
       });
-      // console.log(photoList);
       return photoList;
     },
     totalUsers: async () => {
