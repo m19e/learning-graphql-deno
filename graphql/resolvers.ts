@@ -17,7 +17,7 @@ type Resolvers = {
     inPhotos: (parent: User) => (Photo | undefined)[];
   };
   Query: {
-    totalPhotos: () => number;
+    totalPhotos: () => Promise<number>;
     allPhotos: () => Promise<Photo[]>;
     totalUsers: () => Promise<number>;
     allUsers: () => User[] | Promise<User[]>;
@@ -33,35 +33,12 @@ const headers = {
   Authentication: `Bearer ${SUPABASE_ANON_KEY}`,
   apiKey: SUPABASE_ANON_KEY,
 };
-const allUsersQuery = /* GraphQL */ `
-query {
-  usersCollection {
-    edges {
-      node {
-        id
-        name
-        github_login
-      }
-    }
-  }
-}
-`;
-const allPhotosQuery = /* GraphQL */ `
-{
-  photosCollection {
-    edges {
-      node {
-        id
-        name
-        description
-        category
-        created
-        github_user
-      }
-    }
-  }
-}
-`;
+const postWithHeaders = async <T>(query: string): Promise<T> => {
+  return await ky.post(endpoint, {
+    headers,
+    json: { query },
+  }).json<T>();
+};
 
 type Collection<T> = {
   edges: { node: T }[];
@@ -96,18 +73,41 @@ type Response<T> = {
   errors: undefined;
 } | ResponseError;
 
-const postWithHeaders = async <T>(query: string): Promise<T> => {
-  return await ky.post(endpoint, {
-    headers,
-    json: { query },
-  }).json<T>();
-};
-
 type UsersResponse = Response<UsersData>;
+const allUsersQuery = /* GraphQL */ `
+  query {
+    usersCollection {
+      edges {
+        node {
+          id
+          name
+          github_login
+        }
+      }
+    }
+  }
+  `;
 const fetchAllUsers = async (): Promise<UsersResponse> => {
   return await postWithHeaders<UsersResponse>(allUsersQuery);
 };
+
 type PhotosResponse = Response<PhotosData>;
+const allPhotosQuery = /* GraphQL */ `
+  {
+    photosCollection {
+      edges {
+        node {
+          id
+          name
+          description
+          category
+          created
+          github_user
+        }
+      }
+    }
+  }
+  `;
 const fetchAllPhotos = async (): Promise<PhotosResponse> => {
   return await postWithHeaders<PhotosResponse>(allPhotosQuery);
 };
@@ -137,7 +137,15 @@ export const resolvers: Resolvers = {
     },
   },
   Query: {
-    totalPhotos: () => photos.length,
+    totalPhotos: async () => {
+      const { data, errors } = await fetchAllPhotos();
+      if (errors) {
+        console.log(errors);
+        return 0;
+      }
+      const { edges } = data.photosCollection;
+      return edges.length;
+    },
     allPhotos: async () => {
       const { data, errors } = await fetchAllPhotos();
       if (errors) {
