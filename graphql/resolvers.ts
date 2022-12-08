@@ -18,7 +18,7 @@ type Resolvers = {
   };
   Query: {
     totalPhotos: () => number;
-    allPhotos: () => Photo[];
+    allPhotos: () => Promise<Photo[]>;
     totalUsers: () => Promise<number>;
     allUsers: () => User[] | Promise<User[]>;
   };
@@ -135,11 +135,22 @@ export const resolvers: Resolvers = {
   Query: {
     totalPhotos: () => photos.length,
     allPhotos: async () => {
-      await ky.post(endpoint, {
-        headers,
-        json: { query: allPhotosQuery },
-      }).json<UsersResponse>();
-      return photos;
+      const { data, errors } = await fetchAllPhotos();
+      if (errors) {
+        console.log(errors);
+        return [];
+      }
+      const { edges } = data.photosCollection;
+      const photoList = edges.map(({ node }) => {
+        const { id, github_user, ...other } = node;
+        return {
+          id: String(id),
+          githubUser: github_user,
+          ...other,
+        };
+      });
+      // console.log(photoList);
+      return photoList;
     },
     totalUsers: async () => {
       const { data, errors } = await fetchAllUsers();
