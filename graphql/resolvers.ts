@@ -111,7 +111,6 @@ export const resolvers: Resolvers = {
         return 0;
       }
       const { edges } = data.usersCollection;
-      console.log(edges.map(({ node }) => node));
       return edges.length;
     },
     allUsers: async () => {
