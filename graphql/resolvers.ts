@@ -100,6 +100,14 @@ const fetchAllUsers = async (): Promise<UsersResponse> => {
   }).json<UsersResponse>();
 };
 
+type PhotosResponse = Response<PhotosData>;
+const fetchAllPhotos = async (): Promise<PhotosResponse> => {
+  return await ky.post(endpoint, {
+    headers,
+    json: { query: allPhotosQuery },
+  }).json<PhotosResponse>();
+};
+
 export const resolvers: Resolvers = {
   Photo: {
     url: (parent: Photo) => {
