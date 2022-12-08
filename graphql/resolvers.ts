@@ -1,6 +1,6 @@
 import { GraphQLScalarType, ky } from "../deps.ts";
 
-import type { Photo, PhotoInput, User } from "../types.ts";
+import type { Photo, PhotoCategory, PhotoInput, User } from "../types.ts";
 import { photos, tags, users } from "../mocks.ts";
 
 const SUPABASE_ANON_KEY =
@@ -71,6 +71,19 @@ type UserNode = { id: number; name: string; github_login: string };
 type UsersCollection = Collection<UserNode>;
 type UsersData = {
   usersCollection: UsersCollection;
+};
+
+type PhotoNode = {
+  id: number;
+  name: string;
+  desciption?: string;
+  category: PhotoCategory;
+  github_user: string;
+  created: string;
+};
+type PhotosCollection = Collection<PhotoNode>;
+type PhotosData = {
+  photosCollection: PhotosCollection;
 };
 
 type ResponseError = { errors: { message: string }[]; data: undefined };
