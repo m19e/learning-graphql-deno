@@ -64,7 +64,7 @@ type Response<T> = {
 } | ResponseError;
 
 type UsersResponse = Response<UsersData>;
-const fetchAllUsersData = async (): Promise<UsersResponse> => {
+const fetchAllUsers = async (): Promise<UsersResponse> => {
   return await ky.post(endpoint, {
     headers,
     json: { query: allUsersQuery },
@@ -97,9 +97,15 @@ export const resolvers: Resolvers = {
   },
   Query: {
     totalPhotos: () => photos.length,
-    allPhotos: () => photos,
+    allPhotos: async () => {
+      await ky.post(endpoint, {
+        headers,
+        json: { query: allPhotosQuery },
+      }).json<UsersResponse>();
+      return photos;
+    },
     totalUsers: async () => {
-      const { data, errors } = await fetchAllUsersData();
+      const { data, errors } = await fetchAllUsers();
       if (errors) {
         console.log(errors);
         return 0;
@@ -109,7 +115,7 @@ export const resolvers: Resolvers = {
       return edges.length;
     },
     allUsers: async () => {
-      const { data, errors } = await fetchAllUsersData();
+      const { data, errors } = await fetchAllUsers();
       if (errors) {
         console.log(errors);
         return [];
