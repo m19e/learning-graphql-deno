@@ -27,3 +27,8 @@ export type Tag = {
   photoID: string;
   userID: string;
 };
+
+export type AuthPayload = {
+  token: string;
+  user: User;
+};
