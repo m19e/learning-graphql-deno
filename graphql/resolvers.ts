@@ -1,16 +1,10 @@
 import { GraphQLScalarType, ky } from "../deps.ts";
 
-import type {
-  AuthPayload,
-  Photo,
-  PhotoCategory,
-  PhotoInput,
-  User,
-} from "../types.ts";
-import { CLIENT_ID, CLIENT_SECRET, SUPABASE_ANON_KEY } from "../env.ts";
-import { photos, tags, users } from "../mocks.ts";
+import type { Photo, PhotoCategory, User } from "../types.ts";
+import { SUPABASE_ANON_KEY } from "../env.ts";
+import { Mutation, MutationResolver } from "./mutation.ts";
 
-import { authorizeWithGitHub } from "../lib/github.ts";
+import { photos, tags, users } from "../mocks.ts";
 
 type Resolvers = {
   Photo: {
@@ -28,10 +22,7 @@ type Resolvers = {
     totalUsers: () => Promise<number>;
     allUsers: () => User[] | Promise<User[]>;
   };
-  Mutation: {
-    postPhoto: (_: null, args: PhotoInput) => Photo;
-    githubAuth: (_: null, args: { code: string }) => Promise<AuthPayload>;
-  };
+  Mutation: MutationResolver;
   DateTime: GraphQLScalarType;
 };
 
@@ -195,36 +186,7 @@ export const resolvers: Resolvers = {
       return userList;
     },
   },
-  Mutation: {
-    postPhoto: (_: null, args: PhotoInput): Photo => {
-      const newPhoto: Photo = {
-        ...args.input,
-        id: crypto.randomUUID(),
-        created: new Date().toISOString(),
-      };
-      photos.push(newPhoto);
-      return newPhoto;
-    },
-    githubAuth: async (_, { code }) => {
-      const { access_token, avatar_url, login, name } =
-        await authorizeWithGitHub({
-          client_id: CLIENT_ID!,
-          client_secret: CLIENT_SECRET!,
-          code,
-        });
-      const user: User = {
-        name,
-        githubLogin: login,
-        githubToken: access_token,
-        avatar: avatar_url,
-      };
-
-      return {
-        user,
-        token: access_token,
-      };
-    },
-  },
+  Mutation,
   DateTime: new GraphQLScalarType({
     name: "DateTime",
     description: "A valid date time value.",
