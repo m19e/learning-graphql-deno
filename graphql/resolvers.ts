@@ -1,8 +1,16 @@
 import { GraphQLScalarType, ky } from "../deps.ts";
 
-import type { Photo, PhotoCategory, PhotoInput, User } from "../types.ts";
-import { SUPABASE_ANON_KEY } from "../env.ts";
+import type {
+  AuthPayload,
+  Photo,
+  PhotoCategory,
+  PhotoInput,
+  User,
+} from "../types.ts";
+import { CLIENT_ID, CLIENT_SECRET, SUPABASE_ANON_KEY } from "../env.ts";
 import { photos, tags, users } from "../mocks.ts";
+
+import { authorizeWithGitHub } from "../lib/github.ts";
 
 type Resolvers = {
   Photo: {
@@ -22,6 +30,7 @@ type Resolvers = {
   };
   Mutation: {
     postPhoto: (_: null, args: PhotoInput) => Photo;
+    githubAuth: (_: null, args: { code: string }) => Promise<AuthPayload>;
   };
   DateTime: GraphQLScalarType;
 };
@@ -195,6 +204,25 @@ export const resolvers: Resolvers = {
       };
       photos.push(newPhoto);
       return newPhoto;
+    },
+    githubAuth: async (_, { code }) => {
+      const { access_token, avatar_url, login, name } =
+        await authorizeWithGitHub({
+          client_id: CLIENT_ID!,
+          client_secret: CLIENT_SECRET!,
+          code,
+        });
+      const user: User = {
+        name,
+        githubLogin: login,
+        githubToken: access_token,
+        avatar: avatar_url,
+      };
+
+      return {
+        user,
+        token: access_token,
+      };
     },
   },
   DateTime: new GraphQLScalarType({
