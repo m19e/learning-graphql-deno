@@ -34,6 +34,7 @@ type UserNode = {
   id: number;
   name: string;
   github_login: string;
+  github_token: string;
 };
 type UsersCollection = Collection<UserNode>;
 type UsersData = {
@@ -168,6 +169,7 @@ export const resolvers: Resolvers = {
         { node },
       ) => ({
         githubLogin: node.github_login,
+        githubToken: node.github_token,
         name: node.name,
         postedPhotos: [],
       }));
