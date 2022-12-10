@@ -7,9 +7,14 @@ const headers = {
   apiKey: SUPABASE_ANON_KEY,
 };
 
-export const postWithHeaders = async <T>(query: string): Promise<T> => {
+type Options = {
+  query: string;
+  variables?: string;
+};
+
+export const postWithHeaders = async <T>(options: Options): Promise<T> => {
   return await ky.post(endpoint, {
     headers,
-    json: { query },
+    json: options,
   }).json<T>();
 };

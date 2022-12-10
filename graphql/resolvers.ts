@@ -74,7 +74,7 @@ const allUsersQuery = /* GraphQL */ `
   }
   `;
 const fetchAllUsers = async (): Promise<UsersResponse> => {
-  return await postWithHeaders<UsersResponse>(allUsersQuery);
+  return await postWithHeaders<UsersResponse>({ query: allUsersQuery });
 };
 
 type PhotosResponse = Response<PhotosData>;
@@ -95,7 +95,7 @@ const allPhotosQuery = /* GraphQL */ `
   }
   `;
 const fetchAllPhotos = async (): Promise<PhotosResponse> => {
-  return await postWithHeaders<PhotosResponse>(allPhotosQuery);
+  return await postWithHeaders<PhotosResponse>({ query: allPhotosQuery });
 };
 
 export const resolvers: Resolvers = {
