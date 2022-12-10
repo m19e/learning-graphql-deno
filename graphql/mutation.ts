@@ -34,6 +34,9 @@ export const Mutation: MutationResolver = {
       avatar: avatar_url,
     };
 
+    // TODO find, update user token on supabase gql
+    console.log(user);
+
     return {
       user,
       token: access_token,
