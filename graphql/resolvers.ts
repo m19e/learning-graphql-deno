@@ -1,8 +1,8 @@
-import { GraphQLScalarType, ky } from "../deps.ts";
+import { GraphQLScalarType } from "../deps.ts";
 
 import type { Photo, PhotoCategory, User } from "../types.ts";
-import { SUPABASE_ANON_KEY } from "../env.ts";
 import { Mutation, MutationResolver } from "./mutation.ts";
+import { postWithHeaders } from "../lib/request.ts";
 
 import { photos, tags, users } from "../mocks.ts";
 
@@ -24,18 +24,6 @@ type Resolvers = {
   };
   Mutation: MutationResolver;
   DateTime: GraphQLScalarType;
-};
-
-const endpoint = "http://localhost:54321/graphql/v1";
-const headers = {
-  Authentication: `Bearer ${SUPABASE_ANON_KEY}`,
-  apiKey: SUPABASE_ANON_KEY,
-};
-const postWithHeaders = async <T>(query: string): Promise<T> => {
-  return await ky.post(endpoint, {
-    headers,
-    json: { query },
-  }).json<T>();
 };
 
 type Collection<T> = {
