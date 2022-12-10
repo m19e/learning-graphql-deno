@@ -1,6 +1,6 @@
 import { GraphQLScalarType } from "../deps.ts";
 
-import type { Photo, PhotoCategory, User } from "../types.ts";
+import type { Photo, PhotosResponse, User, UsersResponse } from "../types.ts";
 import { Mutation, MutationResolver } from "./mutation.ts";
 import { postWithHeaders } from "../lib/request.ts";
 
@@ -26,41 +26,6 @@ type Resolvers = {
   DateTime: GraphQLScalarType;
 };
 
-type Collection<T> = {
-  edges: { node: T }[];
-};
-
-type UserNode = {
-  id: number;
-  name: string;
-  github_login: string;
-  github_token: string;
-};
-type UsersCollection = Collection<UserNode>;
-type UsersData = {
-  usersCollection: UsersCollection;
-};
-
-type PhotoNode = {
-  id: number;
-  name: string;
-  desciption?: string;
-  category: PhotoCategory;
-  github_user: string;
-  created: string;
-};
-type PhotosCollection = Collection<PhotoNode>;
-type PhotosData = {
-  photosCollection: PhotosCollection;
-};
-
-type ResponseError = { errors: { message: string }[]; data: undefined };
-type Response<T> = {
-  data: T;
-  errors: undefined;
-} | ResponseError;
-
-type UsersResponse = Response<UsersData>;
 const allUsersQuery = /* GraphQL */ `
   query {
     usersCollection {
@@ -78,7 +43,6 @@ const fetchAllUsers = async (): Promise<UsersResponse> => {
   return await postWithHeaders<UsersResponse>({ query: allUsersQuery });
 };
 
-type PhotosResponse = Response<PhotosData>;
 const allPhotosQuery = /* GraphQL */ `
   {
     photosCollection {
