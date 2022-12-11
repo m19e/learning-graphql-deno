@@ -135,7 +135,6 @@ export const resolvers: Resolvers = {
         githubLogin: node.github_login,
         githubToken: node.github_token,
         name: node.name,
-        postedPhotos: [],
       }));
       return userList;
     },

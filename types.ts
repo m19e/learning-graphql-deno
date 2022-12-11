@@ -21,7 +21,6 @@ export type User = {
   githubToken: string;
   name?: string;
   avatar?: string;
-  postedPhotos?: Photo[];
 };
 
 export type Tag = {
