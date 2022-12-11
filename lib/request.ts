@@ -7,9 +7,14 @@ const headers = {
   apiKey: SUPABASE_ANON_KEY,
 };
 
+interface Variable {
+  [key: string]: string | number | Variable | undefined;
+}
+type Variables = Record<string, Variable>;
+
 type Options = {
   query: string;
-  variables?: string;
+  variables?: Variables;
 };
 
 export const postWithHeaders = async <T>(options: Options): Promise<T> => {
