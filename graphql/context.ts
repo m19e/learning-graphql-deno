@@ -53,6 +53,7 @@ type ContextProps = {
   };
 };
 type Context = (ctx: ContextProps) => Promise<{ currentUser: User | null }>;
+
 export const context: Context = async ({ request }) => {
   const githubToken = request.headers.get("authorization");
   const record = await findUser(githubToken);

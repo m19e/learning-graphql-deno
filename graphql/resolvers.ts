@@ -17,6 +17,11 @@ type Resolvers = {
     inPhotos: (parent: User) => (Photo | undefined)[];
   };
   Query: {
+    me: (
+      _p: null,
+      _a: null,
+      context: { currentUser: User | null },
+    ) => User | null;
     totalPhotos: () => Promise<number>;
     allPhotos: () => Promise<Photo[]>;
     totalUsers: () => Promise<number>;
@@ -88,6 +93,7 @@ export const resolvers: Resolvers = {
     },
   },
   Query: {
+    me: (_p, _a, { currentUser }) => currentUser,
     totalPhotos: async () => {
       const { data, errors } = await fetchAllPhotos();
       if (errors) {
