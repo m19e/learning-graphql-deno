@@ -4,8 +4,8 @@
 #   - net
 #   - env
 
-# envFile:
-#   - .env
+envFile:
+  - .env.development
 
 scripts:
   main:

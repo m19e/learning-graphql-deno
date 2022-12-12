@@ -1,6 +1,7 @@
 import { Application, applyGraphQL, Router } from "./deps.ts";
 
 import { resolvers } from "./graphql/resolvers.ts";
+import { context } from "./graphql/context.ts";
 
 const typeDefs = await Deno.readTextFile("./graphql/typeDefs.graphql");
 
@@ -27,10 +28,7 @@ const GraphQLService = await applyGraphQL<Router>({
   Router,
   typeDefs,
   resolvers,
-  context: (_ctx) => {
-    // this line is for passing a user context for the auth
-    return { user: "Aaron" };
-  },
+  context,
   path: "/playground",
 });
 
