@@ -6,6 +6,7 @@ import type {
   UserRecord,
 } from "../types.ts";
 import { CLIENT_ID, CLIENT_SECRET } from "../env.ts";
+import { convertRecordToUser, convertUserToRecord } from "../utils.ts";
 import { authorizeWithGitHub } from "../lib/github.ts";
 import { postWithHeaders } from "../lib/request.ts";
 
@@ -63,27 +64,6 @@ const postUpdateUser = async (
   });
   const [updatedUser] = res.data.updateusersCollection.records;
   return updatedUser || null;
-};
-
-const convertUserToRecord = (user: User): UserRecord => {
-  const { githubLogin, githubToken, name, avatar } = user;
-
-  return {
-    github_login: githubLogin,
-    github_token: githubToken,
-    name,
-    avatar,
-  };
-};
-const convertRecordToUser = (record: UserRecord): User => {
-  const { github_login, github_token, name, avatar } = record;
-
-  return {
-    githubLogin: github_login,
-    githubToken: github_token,
-    name,
-    avatar,
-  };
 };
 
 type CreateUserResponse = {
