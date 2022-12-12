@@ -1,4 +1,10 @@
-import type { AuthPayload, Photo, PhotoInput, User } from "../types.ts";
+import type {
+  AuthPayload,
+  Photo,
+  PhotoInput,
+  User,
+  UserRecord,
+} from "../types.ts";
 import { CLIENT_ID, CLIENT_SECRET } from "../env.ts";
 import { authorizeWithGitHub } from "../lib/github.ts";
 import { postWithHeaders } from "../lib/request.ts";
@@ -32,12 +38,6 @@ mutation ($objects: [usersInsertInput!]!) {
 }
 `;
 
-type UserRecord = {
-  github_login: string;
-  github_token: string;
-  name: string | null;
-  avatar: string | null;
-};
 type UpdateUserResponse = {
   data: {
     updateusersCollection: {

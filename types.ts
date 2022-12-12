@@ -22,6 +22,12 @@ export type User = {
   name: string | null;
   avatar: string | null;
 };
+export type UserRecord = {
+  github_login: string;
+  github_token: string;
+  name: string | null;
+  avatar: string | null;
+};
 
 export type Tag = {
   photoID: string;
