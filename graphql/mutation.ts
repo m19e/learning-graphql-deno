@@ -53,12 +53,12 @@ const postUpdateUser = async (
   const res = await postWithHeaders<UpdateUserResponse>({
     query: updateUserMutation,
     variables: {
-      "filter": {
-        "github_login": {
-          "eq": login,
+      filter: {
+        github_login: {
+          eq: login,
         },
       },
-      "set": convertUserToRecord(newUser),
+      set: convertUserToRecord(newUser),
     },
   });
   const [updatedUser] = res.data.updateusersCollection.records;
@@ -98,7 +98,7 @@ const postCreateUser = async (newUser: User): Promise<UserRecord> => {
   const { data } = await postWithHeaders<CreateUserResponse>({
     query: createUserMutation,
     variables: {
-      "objects": convertUserToRecord(newUser),
+      objects: convertUserToRecord(newUser),
     },
   });
   const [createdUser] = data.insertIntousersCollection.records;
