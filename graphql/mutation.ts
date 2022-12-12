@@ -144,12 +144,9 @@ export const Mutation: MutationResolver = {
       name,
       avatar: avatar_url,
     };
-    // console.log("auth user: ", authUser);
 
-    // TODO find, update (or create) user token on supabase gql
     try {
       const resUser = await updateOrCreateUser(login, authUser);
-      // console.log("reponse user: ", resUser);
       return {
         user: resUser,
         token: access_token,
