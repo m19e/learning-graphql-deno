@@ -19,8 +19,8 @@ export type PhotoInput = {
 export type User = {
   githubLogin: string;
   githubToken: string;
-  name?: string;
-  avatar?: string;
+  name: string | null;
+  avatar: string | null;
 };
 
 export type Tag = {

@@ -8,7 +8,7 @@ const headers = {
 };
 
 interface Variable {
-  [key: string]: string | number | Variable | undefined;
+  [key: string]: string | number | null | undefined | Variable;
 }
 type Variables = Record<string, Variable>;
 
