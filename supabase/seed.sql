@@ -14,12 +14,12 @@
 --     created date
 -- );
 
-insert into public.users (name, github_login)
-values
-  ('Rio Tsukatsuki', 'rTsukatsuki'),
-  ('Himari Akeboshi', 'hAkeboshi'),
-  ('Yuuka Hayase', 'yHayase'),
-  ('Noa Ushio', 'nUshio');
+-- insert into public.users (name, github_login)
+-- values
+--   ('Rio Tsukatsuki', 'rTsukatsuki'),
+--   ('Himari Akeboshi', 'hAkeboshi'),
+--   ('Yuuka Hayase', 'yHayase'),
+--   ('Noa Ushio', 'nUshio');
 
 insert into public.photos (name, description, category, github_user, created)
 values
