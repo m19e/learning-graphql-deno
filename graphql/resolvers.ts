@@ -1,6 +1,12 @@
 import { GraphQLScalarType } from "../deps.ts";
 
-import type { Photo, PhotosResponse, User, UsersResponse } from "../types.ts";
+import type {
+  Ctx,
+  Photo,
+  PhotosResponse,
+  User,
+  UsersResponse,
+} from "../types.ts";
 import { Mutation, MutationResolver } from "./mutation.ts";
 import { postWithHeaders } from "../lib/request.ts";
 
@@ -20,7 +26,7 @@ type Resolvers = {
     me: (
       _p: null,
       _a: null,
-      context: { currentUser: User | null },
+      ctx: Ctx,
     ) => User | null;
     totalPhotos: () => Promise<number>;
     allPhotos: () => Promise<Photo[]>;

@@ -1,4 +1,4 @@
-import { Response, User, UserRecord } from "../types.ts";
+import { Ctx, Response, UserRecord } from "../types.ts";
 import { convertRecordToUser } from "../utils.ts";
 import { postWithHeaders } from "../lib/request.ts";
 
@@ -52,7 +52,7 @@ type ContextProps = {
     };
   };
 };
-type Context = (ctx: ContextProps) => Promise<{ currentUser: User | null }>;
+type Context = (ctx: ContextProps) => Promise<Ctx>;
 
 export const context: Context = async ({ request }) => {
   const githubToken = request.headers.get("authorization");

@@ -77,3 +77,5 @@ export type Response<T> = {
 
 export type UsersResponse = Response<UsersData>;
 export type PhotosResponse = Response<PhotosData>;
+
+export type Ctx = { currentUser: User | null };
