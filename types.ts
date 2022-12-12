@@ -3,10 +3,10 @@ import type { CATEGORY } from "./consts.ts";
 export type PhotoCategory = keyof typeof CATEGORY;
 
 export type Photo = {
-  id: string;
+  id: number;
   url?: string;
   name: string;
-  desciption?: string;
+  desciption: string | null;
   category: PhotoCategory;
   githubUser: string;
   created: string;

@@ -1,5 +1,8 @@
+import { GQLError } from "../deps.ts";
+
 import type {
   AuthPayload,
+  Ctx,
   Photo,
   PhotoInput,
   User,
@@ -10,8 +13,14 @@ import { convertRecordToUser, convertUserToRecord } from "../utils.ts";
 import { authorizeWithGitHub } from "../lib/github.ts";
 import { postWithHeaders } from "../lib/request.ts";
 
-import { photos } from "../mocks.ts";
-
+type UpdateUserResponse = {
+  data: {
+    updateusersCollection: {
+      affectedCount: number;
+      records: UserRecord[];
+    };
+  };
+};
 const updateUserMutation = /* GraphQL */ `
 mutation ($set: usersUpdateInput!, $filter: usersFilter) {
   updateusersCollection(set: $set, filter: $filter) {
@@ -25,28 +34,6 @@ mutation ($set: usersUpdateInput!, $filter: usersFilter) {
   }
 }
 `;
-const createUserMutation = /* GraphQL */ `
-mutation ($objects: [usersInsertInput!]!) {
-  insertIntousersCollection(objects: $objects) {
-    affectedCount
-    records {
-      github_login
-      github_token
-      name
-      avatar
-    }
-  }
-}
-`;
-
-type UpdateUserResponse = {
-  data: {
-    updateusersCollection: {
-      affectedCount: number;
-      records: UserRecord[];
-    };
-  };
-};
 const postUpdateUser = async (
   login: string,
   newUser: User,
@@ -74,6 +61,19 @@ type CreateUserResponse = {
     };
   };
 };
+const createUserMutation = /* GraphQL */ `
+mutation ($objects: [usersInsertInput!]!) {
+  insertIntousersCollection(objects: $objects) {
+    affectedCount
+    records {
+      github_login
+      github_token
+      name
+      avatar
+    }
+  }
+}
+`;
 const postCreateUser = async (newUser: User): Promise<UserRecord> => {
   const { data } = await postWithHeaders<CreateUserResponse>({
     query: createUserMutation,
@@ -95,20 +95,63 @@ const updateOrCreateUser = async (
   return convertRecordToUser(createdRecord);
 };
 
+type CreatePhotoResponse = {
+  data: {
+    insertIntophotosCollection: {
+      records: { id: number }[];
+    };
+  };
+};
+const createPhotoMutation = /* GraphQL */ `
+mutation ($objects: [photosInsertInput!]!) {
+  insertIntophotosCollection(objects: $objects) {
+    records {
+      id
+    }
+  }
+}
+`;
+const postCreatePhoto = async (
+  photo: Photo,
+): Promise<{ id: number }> => {
+  const { githubUser, name, category, desciption, created } = photo;
+  const { data } = await postWithHeaders<CreatePhotoResponse>({
+    query: createPhotoMutation,
+    variables: {
+      objects: {
+        github_user: githubUser,
+        name,
+        category,
+        desciption,
+        created,
+      },
+    },
+  });
+  const [record] = data.insertIntophotosCollection.records;
+  return record;
+};
+
 export type MutationResolver = {
-  postPhoto: (_: null, args: PhotoInput) => Photo;
+  postPhoto: (_: null, args: PhotoInput, ctx: Ctx) => Promise<Photo>;
   githubAuth: (_: null, args: { code: string }) => Promise<AuthPayload>;
 };
 
 export const Mutation: MutationResolver = {
-  postPhoto: (_: null, args: PhotoInput): Photo => {
+  postPhoto: async (_, args, { currentUser }) => {
+    if (!currentUser) {
+      throw new GQLError(`only an authorized user can post a photo`);
+    }
     const newPhoto: Photo = {
       ...args.input,
-      id: crypto.randomUUID(),
+      githubUser: currentUser.githubLogin,
       created: new Date().toISOString(),
     };
-    photos.push(newPhoto);
-    return newPhoto;
+
+    const record = await postCreatePhoto(newPhoto);
+    return {
+      ...newPhoto,
+      id: record.id,
+    };
   },
   githubAuth: async (_, { code }) => {
     const { access_token, avatar_url, login, name } = await authorizeWithGitHub(
