@@ -70,7 +70,7 @@ type PhotosData = {
 };
 
 type ResponseError = { errors: { message: string }[]; data: undefined };
-type Response<T> = {
+export type Response<T> = {
   data: T;
   errors: undefined;
 } | ResponseError;
