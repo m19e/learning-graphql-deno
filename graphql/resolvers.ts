@@ -83,7 +83,7 @@ export const resolvers: Resolvers = {
       return users.find((u) => u.githubLogin === parent.githubUser);
     },
     taggedUsers: (parent: Photo) => {
-      return tags.filter((tag) => tag.photoID === parent.id).map((
+      return tags.filter((tag) => tag.photoID === String(parent.id)).map((
         { userID },
       ) => users.find((u) => u.githubLogin === userID));
     },
