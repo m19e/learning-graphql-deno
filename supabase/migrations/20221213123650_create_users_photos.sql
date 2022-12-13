@@ -9,6 +9,28 @@ CREATE TYPE public.category AS ENUM
 ALTER TYPE public.category
     OWNER TO postgres;
 
+CREATE TABLE IF NOT EXISTS public.users
+(
+    github_login text COLLATE pg_catalog."default" NOT NULL,
+    github_token text COLLATE pg_catalog."default" NOT NULL,
+    name text COLLATE pg_catalog."default",
+    avatar text COLLATE pg_catalog."default",
+    CONSTRAINT test_users_pkey PRIMARY KEY (github_login)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.users
+    OWNER to postgres;
+
+GRANT ALL ON TABLE public.users TO anon;
+
+GRANT ALL ON TABLE public.users TO authenticated;
+
+GRANT ALL ON TABLE public.users TO postgres;
+
+GRANT ALL ON TABLE public.users TO service_role;
+
 CREATE TABLE IF NOT EXISTS public.photos
 (
     id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
@@ -37,8 +59,3 @@ GRANT ALL ON TABLE public.photos TO service_role;
 
 -- DROP TYPE IF EXISTS public.category;
 
--- CREATE TYPE public.category AS ENUM
---     ('SELFIE', 'PORTRAIT', 'ACTION', 'LANDSCAPE', 'GRAPHIC');
-
--- ALTER TYPE public.category
---     OWNER TO postgres;
