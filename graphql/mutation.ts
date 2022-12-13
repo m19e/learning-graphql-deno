@@ -16,7 +16,6 @@ import { postWithHeaders } from "../lib/request.ts";
 type UpdateUserResponse = {
   data: {
     updateusersCollection: {
-      affectedCount: number;
       records: UserRecord[];
     };
   };
@@ -24,7 +23,6 @@ type UpdateUserResponse = {
 const updateUserMutation = /* GraphQL */ `
 mutation ($set: usersUpdateInput!, $filter: usersFilter) {
   updateusersCollection(set: $set, filter: $filter) {
-    affectedCount
     records {
       github_login
       github_token
@@ -56,7 +54,6 @@ const postUpdateUser = async (
 type CreateUserResponse = {
   data: {
     insertIntousersCollection: {
-      affectedCount: number;
       records: UserRecord[];
     };
   };
@@ -64,7 +61,6 @@ type CreateUserResponse = {
 const createUserMutation = /* GraphQL */ `
 mutation ($objects: [usersInsertInput!]!) {
   insertIntousersCollection(objects: $objects) {
-    affectedCount
     records {
       github_login
       github_token
