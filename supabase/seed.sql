@@ -14,12 +14,9 @@
 --     created date
 -- );
 
--- insert into public.users (name, github_login)
--- values
---   ('Rio Tsukatsuki', 'rTsukatsuki'),
---   ('Himari Akeboshi', 'hAkeboshi'),
---   ('Yuuka Hayase', 'yHayase'),
---   ('Noa Ushio', 'nUshio');
+insert into public.users (github_login, github_token, name, avatar)
+values
+  ('m19e', '', NULL, 'https://avatars.githubusercontent.com/u/49052459?v=4');
 
 insert into public.photos (name, description, category, github_user, created)
 values
