@@ -95,7 +95,7 @@ export const resolvers: Resolvers = {
     inPhotos: (parent: User) => {
       return tags.filter((tag) => tag.userID === parent.githubLogin).map((
         { photoID },
-      ) => photos.find((p) => p.id === photoID));
+      ) => photos.find((p) => String(p.id) === photoID));
     },
   },
   Query: {
@@ -116,12 +116,11 @@ export const resolvers: Resolvers = {
         return [];
       }
       const { edges } = data.photosCollection;
-      const photoList = edges.map(({ node }) => {
-        const { id, github_user, ...other } = node;
+      const photoList: Photo[] = edges.map(({ node }) => {
+        const { github_user, ...other } = node;
         return {
-          id: String(id),
-          githubUser: github_user,
           ...other,
+          githubUser: github_user,
         };
       });
       return photoList;
