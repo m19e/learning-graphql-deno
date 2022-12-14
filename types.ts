@@ -59,7 +59,7 @@ type UsersData = {
 type PhotoNode = {
   id: number;
   name: string;
-  desciption?: string;
+  desciption: string | null;
   category: PhotoCategory;
   github_user: string;
   created: string;
