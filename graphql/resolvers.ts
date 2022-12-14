@@ -101,7 +101,6 @@ export const resolvers: Resolvers = {
       return `/img/photos/${parent.id}.jpg`;
     },
     postedBy: async (parent: Photo) => {
-      // TODO update for supabase
       const { data, errors } = await postWithHeaders<UsersResponse>({
         query: postedByQuery,
         variables: {
