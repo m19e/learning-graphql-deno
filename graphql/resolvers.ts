@@ -9,6 +9,7 @@ import type {
 } from "../types.ts";
 import { Mutation, MutationResolver } from "./mutation.ts";
 import { postWithHeaders } from "../lib/request.ts";
+import { convertRecordToUser } from "../utils.ts";
 
 import { photos, tags, users } from "../mocks.ts";
 
@@ -16,7 +17,7 @@ type Resolvers = {
   Photo: {
     id: (parent: Photo) => Photo["id"];
     url: (parent: Photo) => string;
-    postedBy: (parent: Photo) => User | undefined;
+    postedBy: (parent: Photo) => Promise<User | null>;
     taggedUsers: (parent: Photo) => (User | undefined)[];
   };
   User: {
@@ -76,6 +77,21 @@ const fetchAllPhotos = async (): Promise<PhotosResponse> => {
   return await postWithHeaders<PhotosResponse>({ query: allPhotosQuery });
 };
 
+const postedByQuery = /* GraphQL */ `
+query ($filter: usersFilter) {
+  usersCollection(filter: $filter) {
+    edges {
+      node {
+        github_login
+        github_token
+        name
+        avatar
+      }
+    }
+  }
+}
+`;
+
 export const resolvers: Resolvers = {
   Photo: {
     id: (parent: Photo) => {
@@ -84,8 +100,23 @@ export const resolvers: Resolvers = {
     url: (parent: Photo) => {
       return `/img/photos/${parent.id}.jpg`;
     },
-    postedBy: (parent: Photo) => {
-      return users.find((u) => u.githubLogin === parent.githubUser);
+    postedBy: async (parent: Photo) => {
+      // TODO update for supabase
+      const { data, errors } = await postWithHeaders<UsersResponse>({
+        query: postedByQuery,
+        variables: {
+          filter: {
+            github_login: {
+              eq: parent.githubUser,
+            },
+          },
+        },
+      });
+      if (errors) {
+        console.error(errors);
+        return null;
+      }
+      return convertRecordToUser(data.usersCollection.edges[0].node);
     },
     taggedUsers: (parent: Photo) => {
       return tags.filter((tag) => tag.photoID === String(parent.id)).map((
