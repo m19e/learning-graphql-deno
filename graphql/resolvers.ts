@@ -14,6 +14,7 @@ import { photos, tags, users } from "../mocks.ts";
 
 type Resolvers = {
   Photo: {
+    id: (parent: Photo) => Photo["id"];
     url: (parent: Photo) => string;
     postedBy: (parent: Photo) => User | undefined;
     taggedUsers: (parent: Photo) => (User | undefined)[];
@@ -76,8 +77,11 @@ const fetchAllPhotos = async (): Promise<PhotosResponse> => {
 
 export const resolvers: Resolvers = {
   Photo: {
+    id: (parent: Photo) => {
+      return parent.id;
+    },
     url: (parent: Photo) => {
-      return `https://mysite.com/assets/img/${parent.id}.png`;
+      return `/img/photos/${parent.id}.jpg`;
     },
     postedBy: (parent: Photo) => {
       return users.find((u) => u.githubLogin === parent.githubUser);
