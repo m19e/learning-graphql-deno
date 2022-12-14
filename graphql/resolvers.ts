@@ -39,38 +39,39 @@ type Resolvers = {
 };
 
 const allUsersQuery = /* GraphQL */ `
-  query {
-    usersCollection {
-      edges {
-        node {
-          id
-          name
-          github_login
-        }
+{
+  usersCollection {
+    edges {
+      node {
+        github_login
+        github_token
+        name
+        avatar
       }
     }
   }
-  `;
+}
+`;
 const fetchAllUsers = async (): Promise<UsersResponse> => {
   return await postWithHeaders<UsersResponse>({ query: allUsersQuery });
 };
 
 const allPhotosQuery = /* GraphQL */ `
-  {
-    photosCollection {
-      edges {
-        node {
-          id
-          name
-          description
-          category
-          created
-          github_user
-        }
+{
+  photosCollection {
+    edges {
+      node {
+        id
+        name
+        description
+        category
+        created
+        github_user
       }
     }
   }
-  `;
+}
+`;
 const fetchAllPhotos = async (): Promise<PhotosResponse> => {
   return await postWithHeaders<PhotosResponse>({ query: allPhotosQuery });
 };
