@@ -46,10 +46,10 @@ type Collection<T> = {
 };
 
 type UserNode = {
-  id: number;
-  name: string;
   github_login: string;
   github_token: string;
+  name: string;
+  avatar: string;
 };
 type UsersCollection = Collection<UserNode>;
 type UsersData = {
