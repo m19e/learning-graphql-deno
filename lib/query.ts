@@ -1,4 +1,5 @@
-import { Response, UserRecord } from "../types.ts";
+import { Response, User, UserRecord } from "../types.ts";
+import { convertRecordToUser } from "../utils.ts";
 import { postWithHeaders } from "./request.ts";
 
 // Users Collection
@@ -13,23 +14,23 @@ type FindUserData = {
 };
 type FindUserResponse = Response<FindUserData>;
 const findUserQuery = /* GraphQL */ `
-  query ($filter: usersFilter) {
-    usersCollection(filter: $filter) {
-      edges {
-        node {
-          github_login
-          github_token
-          name
-          avatar
-        }
+query ($filter: usersFilter) {
+  usersCollection(filter: $filter) {
+    edges {
+      node {
+        github_login
+        github_token
+        name
+        avatar
       }
     }
   }
-  `;
+}
+`;
 
 export const findUserByToken = async (
   token: string,
-): Promise<UserRecord | null> => {
+): Promise<User | null> => {
   const { data, errors } = await postWithHeaders<FindUserResponse>({
     query: findUserQuery,
     variables: {
@@ -45,5 +46,5 @@ export const findUserByToken = async (
     return null;
   }
   const [userEdge] = data.usersCollection.edges;
-  return userEdge.node;
+  return convertRecordToUser(userEdge.node);
 };
