@@ -1,4 +1,4 @@
-import { GQLError } from "../deps.ts";
+import { GQLError, ky } from "../deps.ts";
 
 import type {
   AuthPayload,
@@ -127,9 +127,75 @@ const postCreatePhoto = async (
   return record;
 };
 
+type FakeUsersResponse = {
+  results: {
+    login: {
+      sha1: string;
+    };
+    picture: {
+      thumbnail: string;
+    };
+  }[];
+};
+
+const fakeUserNames = [
+  "Rio Tsukatsuki",
+  "Himari Akeboshi",
+  "Noa Ushio",
+  "Yuuka Hayase",
+  "Koyuki Kurosaki",
+  "Momoi Saiba",
+  "Midori Saiba",
+  "Yuzu Hanaoka",
+  "Arisu Tendou",
+  "Neru Mikamo",
+  "Karin Kakudate",
+  "Akane Murokasa",
+  "Asuna Ichinose",
+  "Toki Asuma",
+  "Hibiki Nekozuka",
+  "Utaha Shiraishi",
+  "Kotori Toyomi",
+] as const;
+const fakeUsers: Omit<User, "githubToken" | "avatar">[] = fakeUserNames.map(
+  (name) => {
+    const [first, last] = name.split(" ");
+    const login = [...first][0].toLowerCase() + last;
+    return { githubLogin: login, name };
+  },
+);
+
+const postCreateUsers = async (newUsers: User[]): Promise<User[]> => {
+  const { data } = await postWithHeaders<CreateUserResponse>({
+    query: createUserMutation,
+    variables: {
+      objects: newUsers.map(convertUserToRecord),
+    },
+  });
+  const users = data.insertIntousersCollection.records.map(convertRecordToUser);
+  return users;
+};
+const addFakeUsers: MutationResolver["addFakeUsers"] = async (_, { count }) => {
+  const { results } = await ky.get(
+    `https://randomuser.me/api/?results=${count}`,
+  ).json<FakeUsersResponse>();
+
+  const users = results.map((r, index) => ({
+    githubLogin: fakeUsers[index].githubLogin,
+    githubToken: r.login.sha1,
+    name: fakeUsers[index].name,
+    avatar: r.picture.thumbnail,
+  }));
+
+  await postCreateUsers(users);
+
+  return users;
+};
+
 export type MutationResolver = {
   postPhoto: (_: null, args: PhotoInput, ctx: Ctx) => Promise<Photo>;
   githubAuth: (_: null, args: { code: string }) => Promise<AuthPayload>;
+  addFakeUsers: (_: null, args: { count: number }) => Promise<User[]>;
 };
 
 export const Mutation: MutationResolver = {
@@ -178,4 +244,5 @@ export const Mutation: MutationResolver = {
       };
     }
   },
+  addFakeUsers,
 };

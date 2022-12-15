@@ -10,7 +10,7 @@ const headers = {
 interface Variable {
   [key: string]: string | number | null | undefined | Variable;
 }
-type Variables = Record<string, Variable>;
+type Variables = Record<string, Variable | Variable[]>;
 
 type Options = {
   query: string;
