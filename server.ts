@@ -29,7 +29,6 @@ const GraphQLService = await applyGraphQL<Router>({
   typeDefs,
   resolvers,
   context,
-  path: "/playground",
 });
 
 app.use(
