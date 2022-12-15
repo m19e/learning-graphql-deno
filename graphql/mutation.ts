@@ -12,6 +12,7 @@ import { CLIENT_ID, CLIENT_SECRET } from "../env.ts";
 import { convertRecordToUser, convertUserToRecord } from "../utils.ts";
 import { authorizeWithGitHub } from "../lib/github.ts";
 import { postWithHeaders } from "../lib/request.ts";
+import { findUserByLogin } from "../lib/query.ts";
 
 type UpdateUserResponse = {
   data: {
@@ -192,10 +193,28 @@ const addFakeUsers: MutationResolver["addFakeUsers"] = async (_, { count }) => {
   return users;
 };
 
+const fakeUserAuth: MutationResolver["fakeUserAuth"] = async (
+  _,
+  { githubLogin },
+) => {
+  const user = await findUserByLogin(githubLogin);
+  if (!user) {
+    throw new GQLError(`Cannot find user with githubLogin "${githubLogin}"`);
+  }
+  return {
+    token: user.githubToken,
+    user,
+  };
+};
+
 export type MutationResolver = {
   postPhoto: (_: null, args: PhotoInput, ctx: Ctx) => Promise<Photo>;
   githubAuth: (_: null, args: { code: string }) => Promise<AuthPayload>;
   addFakeUsers: (_: null, args: { count: number }) => Promise<User[]>;
+  fakeUserAuth: (
+    _: null,
+    args: { githubLogin: string },
+  ) => Promise<AuthPayload>;
 };
 
 export const Mutation: MutationResolver = {
@@ -245,4 +264,5 @@ export const Mutation: MutationResolver = {
     }
   },
   addFakeUsers,
+  fakeUserAuth,
 };
