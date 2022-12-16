@@ -1,4 +1,4 @@
-import { Application, applyGraphQL, Router } from "./deps.ts";
+import { Application, applyGraphQL, oakCors, Router } from "./deps.ts";
 
 import { resolvers } from "./graphql/resolvers.ts";
 import { context } from "./graphql/context.ts";
@@ -35,6 +35,13 @@ app.use(
   router.routes(),
   GraphQLService.routes(),
   GraphQLService.allowedMethods(),
+);
+
+app.use(
+  oakCors({
+    origin: "http://localhost:8000",
+    optionsSuccessStatus: 200,
+  }),
 );
 
 console.log("Server start at http://localhost:4000");
