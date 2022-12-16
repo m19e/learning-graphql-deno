@@ -10,9 +10,9 @@ const headers = {
 interface Variable {
   [key: string]: string | number | null | undefined | Variable;
 }
-type Variables = Record<string, Variable | Variable[]>;
+export type Variables = Record<string, Variable | Variable[]>;
 
-type Options = {
+export type Options = {
   query: string;
   variables?: Variables;
 };
