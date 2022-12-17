@@ -39,7 +39,7 @@ app.use(
 
 app.use(
   oakCors({
-    origin: "http://localhost:8000",
+    origin: "http://localhost:5173",
     optionsSuccessStatus: 200,
   }),
 );
