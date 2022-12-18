@@ -177,12 +177,7 @@ export const resolvers: Resolvers = {
       }
       const userList: User[] = data.usersCollection.edges.map((
         { node },
-      ) => ({
-        githubLogin: node.github_login,
-        githubToken: node.github_token,
-        name: node.name,
-        avatar: null,
-      }));
+      ) => convertRecordToUser(node));
       return userList;
     },
   },
