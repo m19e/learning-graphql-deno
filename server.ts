@@ -31,18 +31,12 @@ const GraphQLService = await applyGraphQL<Router>({
   context,
 });
 
+app.use(oakCors());
 app.use(
   router.routes(),
   GraphQLService.routes(),
   GraphQLService.allowedMethods(),
 );
 
-app.use(
-  oakCors({
-    origin: "http://localhost:5173",
-    optionsSuccessStatus: 200,
-  }),
-);
-
-console.log("Server start at http://localhost:4000");
+console.log(`Server start at http://localhost:4000`);
 await app.listen({ port: 4000 });
