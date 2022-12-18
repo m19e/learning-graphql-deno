@@ -5,6 +5,7 @@ import type {
   Ctx,
   Photo,
   PhotoInput,
+  Response,
   User,
   UserRecord,
 } from "../types.ts";
@@ -52,13 +53,11 @@ const postUpdateUser = async (
   return updatedUser || null;
 };
 
-type CreateUserResponse = {
-  data: {
-    insertIntousersCollection: {
-      records: UserRecord[];
-    };
+type CreateUserResponse = Response<{
+  insertIntousersCollection: {
+    records: UserRecord[];
   };
-};
+}>;
 const createUserMutation = /* GraphQL */ `
 mutation ($objects: [usersInsertInput!]!) {
   insertIntousersCollection(objects: $objects) {
@@ -72,12 +71,16 @@ mutation ($objects: [usersInsertInput!]!) {
 }
 `;
 const postCreateUser = async (newUser: User): Promise<UserRecord> => {
-  const { data } = await postWithHeaders<CreateUserResponse>({
+  const { data, errors } = await postWithHeaders<CreateUserResponse>({
     query: createUserMutation,
     variables: {
       objects: convertUserToRecord(newUser),
     },
   });
+  if (errors) {
+    console.error(errors);
+    throw new GQLError(`create user error`);
+  }
   const [createdUser] = data.insertIntousersCollection.records;
   return createdUser;
 };
@@ -167,12 +170,16 @@ const fakeUsers: Omit<User, "githubToken" | "avatar">[] = fakeUserNames.map(
 );
 
 const postCreateUsers = async (newUsers: User[]): Promise<User[]> => {
-  const { data } = await postWithHeaders<CreateUserResponse>({
+  const { data, errors } = await postWithHeaders<CreateUserResponse>({
     query: createUserMutation,
     variables: {
       objects: newUsers.map(convertUserToRecord),
     },
   });
+  if (errors) {
+    console.error(errors);
+    throw new GQLError(`create user error`);
+  }
   const users = data.insertIntousersCollection.records.map(convertRecordToUser);
   return users;
 };
