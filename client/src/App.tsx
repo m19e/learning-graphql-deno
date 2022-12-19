@@ -16,7 +16,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="App">
-        <div>
+        <div className="flex">
           <a href="https://vitejs.dev" target="_blank">
             <img src="/vite.svg" className="logo" alt="Vite logo" />
           </a>
@@ -84,14 +84,7 @@ const Users = () => {
 type UserListProps = { count: number; users: Partial<User>[] };
 const UserList = ({ count, users }: UserListProps) => {
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-start",
-        gap: "1rem",
-      }}
-    >
+    <div className="flex flex-col items-start gap-4">
       <span>{count} Users</span>
       {users.map((user) => <UserListItem key={user.githubLogin} user={user} />)}
     </div>
@@ -102,11 +95,7 @@ const UserListItem = ({ user }: { user: Partial<User> }) => {
   return (
     <div
       key={user.githubLogin}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "0.5rem",
-      }}
+      className="flex items-center gap-2"
     >
       <img
         src="https://placehold.jp/50x50.png"
@@ -114,7 +103,9 @@ const UserListItem = ({ user }: { user: Partial<User> }) => {
         height={48}
         alt=""
       />
-      {user.name ?? user.githubLogin}
+      <span className="text-blue-300">
+        {user.name ?? user.githubLogin}
+      </span>
     </div>
   );
 };
