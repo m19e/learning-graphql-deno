@@ -6,6 +6,7 @@ import ky from "ky";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 
 import type { Options, Response } from "./types";
+import { AllUsersQuery as AllUsersData } from "./generated";
 
 const queryClient = new QueryClient();
 
@@ -56,16 +57,17 @@ const allUsersQuery = /* GraphQL */ `
     totalUsers
     allUsers {
       githubLogin
+      name
       avatar
     }
   }
 `;
-type AllUsersData = {
-  allUsers: {
-    githubLogin: string;
-    avatar: string;
-  }[];
-};
+// type AllUsersData = {
+//   allUsers: {
+//     githubLogin: string;
+//     avatar: string;
+//   }[];
+// };
 
 const fetchAllUsers = async () => {
   return await fetcher<AllUsersData>({ query: allUsersQuery });

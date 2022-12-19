@@ -1,4 +1,3 @@
-import { useQuery, UseQueryOptions } from "react-query";
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -10,31 +9,6 @@ export type MakeOptional<T, K extends keyof T> =
 export type MakeMaybe<T, K extends keyof T> =
   & Omit<T, K>
   & { [SubKey in K]: Maybe<T[SubKey]> };
-
-function fetcher<TData, TVariables>(
-  endpoint: string,
-  requestInit: RequestInit,
-  query: string,
-  variables?: TVariables,
-) {
-  return async (): Promise<TData> => {
-    const res = await fetch(endpoint, {
-      method: "POST",
-      ...requestInit,
-      body: JSON.stringify({ query, variables }),
-    });
-
-    const json = await res.json();
-
-    if (json.errors) {
-      const { message } = json.errors[0];
-
-      throw new Error(message);
-    }
-
-    return json.data;
-  };
-}
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -126,34 +100,11 @@ export type AllUsersQuery = {
   __typename?: "Query";
   totalUsers: number;
   allUsers: Array<
-    { __typename?: "User"; githubLogin: string; avatar?: string | null }
+    {
+      __typename?: "User";
+      githubLogin: string;
+      name?: string | null;
+      avatar?: string | null;
+    }
   >;
 };
-
-export const AllUsersDocument = /* GraphQL */ `
-query allUsers {
-  totalUsers
-  allUsers {
-    githubLogin
-    avatar
-  }
-}
-`;
-export const useAllUsersQuery = <
-  TData = AllUsersQuery,
-  TError = unknown,
->(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
-  variables?: AllUsersQueryVariables,
-  options?: UseQueryOptions<AllUsersQuery, TError, TData>,
-) =>
-  useQuery<AllUsersQuery, TError, TData>(
-    variables === undefined ? ["allUsers"] : ["allUsers", variables],
-    fetcher<AllUsersQuery, AllUsersQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
-      AllUsersDocument,
-      variables,
-    ),
-    options,
-  );
