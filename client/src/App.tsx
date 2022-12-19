@@ -74,18 +74,34 @@ const fetchAllUsers = async () => {
 };
 
 const Users = () => {
-  const { data, error } = useQuery(allUsersQuery, fetchAllUsers);
+  const { data, error, refetch } = useQuery(allUsersQuery, fetchAllUsers);
 
-  if (error) return <span>!ERROR!</span>;
+  if (error) return <span>ERROR</span>;
   if (!data) return <span>loading users...</span>;
-  return <UserList count={data.totalUsers} users={data.allUsers} />;
+  return (
+    <UserList
+      count={data.totalUsers}
+      users={data.allUsers}
+      refetchUsers={refetch}
+    />
+  );
 };
 
-type UserListProps = { count: number; users: Partial<User>[] };
-const UserList = ({ count, users }: UserListProps) => {
+type UserListProps = {
+  count: number;
+  users: Partial<User>[];
+  refetchUsers: () => void;
+};
+const UserList = ({ count, users, refetchUsers }: UserListProps) => {
   return (
     <div className="flex flex-col items-start gap-4">
       <span>{count} Users</span>
+      <button
+        className="bg-blue-700 hover:bg-blue-600 text-white rounded px-4 py-2"
+        onClick={() => refetchUsers()}
+      >
+        Refetch User
+      </button>
       {users.map((user) => <UserListItem key={user.githubLogin} user={user} />)}
     </div>
   );
@@ -103,7 +119,7 @@ const UserListItem = ({ user }: { user: Partial<User> }) => {
         height={48}
         alt=""
       />
-      <span className="text-blue-300">
+      <span className="text-blue-500">
         {user.name ?? user.githubLogin}
       </span>
     </div>
