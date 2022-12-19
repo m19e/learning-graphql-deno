@@ -40,7 +40,7 @@ scripts:
 
   test:
     desc: Runs the tests
-    cmd: deno test --reload
+    cmd: deno test --reload test.ts
     gitHook: pre-push
 
   cov:
