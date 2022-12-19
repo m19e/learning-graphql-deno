@@ -5,7 +5,7 @@ import "./App.css";
 import ky from "ky";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 
-import type { Options, Response } from "./types";
+import type { Options, Response, User } from "./types";
 import { AllUsersQuery as AllUsersData } from "./generated";
 
 const queryClient = new QueryClient();
@@ -77,12 +77,44 @@ const Users = () => {
   const { data, error } = useQuery(allUsersQuery, fetchAllUsers);
 
   if (error) return <span>!ERROR!</span>;
-  if (!data) return <span>loading...</span>;
+  if (!data) return <span>loading users...</span>;
+  return <UserList count={data.totalUsers} users={data.allUsers} />;
+};
+
+type UserListProps = { count: number; users: Partial<User>[] };
+const UserList = ({ count, users }: UserListProps) => {
   return (
-    <div style={{ display: "flex" }}>
-      <span style={{ whiteSpace: "pre-wrap", textAlign: "left" }}>
-        {JSON.stringify(data, null, 4)}
-      </span>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        gap: "1rem",
+      }}
+    >
+      <span>{count} Users</span>
+      {users.map((user) => <UserListItem key={user.githubLogin} user={user} />)}
+    </div>
+  );
+};
+
+const UserListItem = ({ user }: { user: Partial<User> }) => {
+  return (
+    <div
+      key={user.githubLogin}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "0.5rem",
+      }}
+    >
+      <img
+        src="https://placehold.jp/50x50.png"
+        width={48}
+        height={48}
+        alt=""
+      />
+      {user.name ?? user.githubLogin}
     </div>
   );
 };
