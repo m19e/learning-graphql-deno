@@ -1,4 +1,4 @@
-type User = {
+export type User = {
   githubLogin: string;
   githubToken: string;
   name: string | null;
