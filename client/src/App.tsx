@@ -44,6 +44,8 @@ function App() {
 
 const endpoint = "http://localhost:4000/graphql";
 const fetcher = async <T,>(options: Options): Promise<T | undefined> => {
+  console.log("fetch now: ", new Date());
+
   const res = await ky
     .post(endpoint, {
       json: options,
@@ -74,7 +76,10 @@ const fetchAllUsers = async () => {
 };
 
 const Users = () => {
-  const { data, error, refetch } = useQuery(allUsersQuery, fetchAllUsers);
+  const { data, error, refetch } = useQuery({
+    queryKey: [allUsersQuery],
+    queryFn: fetchAllUsers,
+  });
 
   if (error) return <span>ERROR</span>;
   if (!data) return <span>loading users...</span>;
