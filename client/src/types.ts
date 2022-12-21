@@ -20,5 +20,7 @@ type Variables = Record<string, Variable | Variable[] | unknown>;
 
 export type Options = {
   query: string;
-  variables?: Variables;
+  variables?: {
+    [key: string]: unknown;
+  };
 };
