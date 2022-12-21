@@ -1,8 +1,4 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import "./App.css";
-
-import ky from "ky";
 import {
   QueryClient,
   QueryClientProvider,
@@ -10,14 +6,16 @@ import {
   useQuery,
   useQueryClient,
 } from "react-query";
+import reactLogo from "./assets/react.svg";
+import "./App.css";
 
-import type { Options, Response, User } from "./types";
+import type { User } from "./types";
 import { ADD_FAKE_USERS_MUTATION, ALL_USERS_QUERY } from "./query";
 import {
-  AddFakeUsersMutation,
-  AddFakeUsersMutationVariables,
-  AllUsersQuery as AllUsersData,
-} from "./generated";
+  fetchAddFakeUsers,
+  fetchAllUsers,
+  makeQueryRefetcher,
+} from "./fetcher";
 
 const queryClient = new QueryClient();
 
@@ -53,22 +51,6 @@ function App() {
   );
 }
 
-const endpoint = "http://localhost:4000/graphql";
-const fetcher = async <T,>(options: Options): Promise<T | undefined> => {
-  console.log("fetch now: ", new Date());
-
-  const res = await ky
-    .post(endpoint, {
-      json: options,
-    })
-    .json<Response<T>>();
-  return res.data;
-};
-
-const fetchAllUsers = async () => {
-  return await fetcher<AllUsersData>({ query: ALL_USERS_QUERY });
-};
-
 const Users = () => {
   const { data, error, refetch } = useQuery({
     queryKey: [ALL_USERS_QUERY],
@@ -85,21 +67,6 @@ const Users = () => {
     />
   );
 };
-
-const fetchAddFakeUsers = async (variables: AddFakeUsersMutationVariables) => {
-  return await fetcher<AddFakeUsersMutation>({
-    query: ADD_FAKE_USERS_MUTATION,
-    variables,
-  });
-};
-const makeQueryRefetcher =
-  (client: QueryClient, queryKey: string | string[]) => async () => {
-    await client.refetchQueries({
-      queryKey,
-      active: true,
-      exact: true,
-    });
-  };
 
 type UserListProps = {
   count: number;
