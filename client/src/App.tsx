@@ -4,11 +4,13 @@ import reactLogo from "./assets/react.svg";
 import "./App.css";
 
 import { Users } from "./Users";
+import { AuthorizedUser } from "./AuthorizedUser";
 
 const App = () => (
   <BrowserRouter>
     <div>
       <DefaultContent />
+      <AuthorizedUser />
       <Users />
     </div>
   </BrowserRouter>
