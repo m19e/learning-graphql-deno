@@ -16,7 +16,7 @@ export type Response<T> =
 interface Variable {
   [key: string]: string | number | null | undefined | Variable;
 }
-type Variables = Record<string, Variable | Variable[]>;
+type Variables = Record<string, Variable | Variable[] | unknown>;
 
 export type Options = {
   query: string;
