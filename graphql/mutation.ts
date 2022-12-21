@@ -149,7 +149,7 @@ const fakeUserNames = [
   "Yuuka Hayase",
   "Koyuki Kurosaki",
   "Momoi Saiba",
-  "Midori Saiba",
+  // "Midori Saiba",
   "Yuzu Hanaoka",
   "Arisu Tendou",
   "Neru Mikamo",
@@ -183,18 +183,28 @@ const postCreateUsers = async (newUsers: User[]): Promise<User[]> => {
   const users = data.insertIntousersCollection.records.map(convertRecordToUser);
   return users;
 };
+let addedCount = 0;
 const addFakeUsers: MutationResolver["addFakeUsers"] = async (_, { count }) => {
+  const currentCount = addedCount + count;
+  if (fakeUsers.length < currentCount) {
+    throw new GQLError(`out of range: fake-users`);
+  }
+
   const { results } = await ky.get(
     `https://randomuser.me/api/?results=${count}`,
   ).json<FakeUsersResponse>();
 
-  const users = results.map((r, index) => ({
-    githubLogin: fakeUsers[index].githubLogin,
-    githubToken: r.login.sha1,
-    name: fakeUsers[index].name,
-    avatar: r.picture.thumbnail,
-  }));
+  const users = results.map((r, i) => {
+    const index = addedCount + i;
+    return ({
+      githubLogin: fakeUsers[index].githubLogin,
+      githubToken: r.login.sha1,
+      name: fakeUsers[index].name,
+      avatar: r.picture.thumbnail,
+    });
+  });
 
+  addedCount = currentCount;
   await postCreateUsers(users);
 
   return users;
