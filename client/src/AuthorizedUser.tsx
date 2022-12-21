@@ -23,7 +23,7 @@ export const AuthorizedUser = () => {
     <button
       onClick={requestCode}
       disabled={isSignIn}
-      className="flex gap-2 items-center bg-gray-200 p-2"
+      className="flex gap-2 items-center bg-gray-800 p-2 text-white"
     >
       <svg
         className="w-6 h-6"
