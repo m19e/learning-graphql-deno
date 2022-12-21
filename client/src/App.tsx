@@ -3,10 +3,20 @@ import reactLogo from "./assets/react.svg";
 import "./App.css";
 
 import ky from "ky";
-import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "react-query";
 
 import type { Options, Response, User } from "./types";
-import { AllUsersQuery as AllUsersData } from "./generated";
+import {
+  AddFakeUsersMutation,
+  AddFakeUsersMutationVariables,
+  AllUsersQuery as AllUsersData,
+} from "./generated";
 
 const queryClient = new QueryClient();
 
@@ -55,16 +65,15 @@ const fetcher = async <T,>(options: Options): Promise<T | undefined> => {
 };
 
 const ALL_USERS_QUERY = /* GraphQL */ `
-  {
-    totalUsers
-    allUsers {
-      githubLogin
-      name
-      avatar
-    }
+query {
+  totalUsers
+  allUsers {
+    githubLogin
+    name
+    avatar
   }
+}
 `;
-
 const fetchAllUsers = async () => {
   return await fetcher<AllUsersData>({ query: ALL_USERS_QUERY });
 };
@@ -86,21 +95,59 @@ const Users = () => {
   );
 };
 
+const ADD_FAKE_USERS_MUTATION = /* GraphQL */ `
+mutation($count: Int!) {
+  addFakeUsers(count: $count) {
+    githubLogin
+    name
+    avatar
+  }
+}
+`;
+const fetchAddFakeUsers = async (variables: AddFakeUsersMutationVariables) => {
+  return await fetcher<AddFakeUsersMutation>({
+    query: ADD_FAKE_USERS_MUTATION,
+    variables,
+  });
+};
+
+const makeRefetchQuery = (queryKey: string | string[]) => async () => {
+  await queryClient.refetchQueries({
+    queryKey,
+    active: true,
+    exact: true,
+  });
+};
+
 type UserListProps = {
   count: number;
   users: Partial<User>[];
   refetchUsers: () => void;
 };
 const UserList = ({ count, users, refetchUsers }: UserListProps) => {
+  const { mutate } = useMutation({
+    mutationKey: [ADD_FAKE_USERS_MUTATION],
+    mutationFn: fetchAddFakeUsers,
+    onSuccess: makeRefetchQuery(ALL_USERS_QUERY),
+  });
+
   return (
     <div className="flex flex-col items-start gap-4">
       <span>{count} Users</span>
-      <button
-        className="bg-blue-700 hover:bg-blue-600 text-white rounded px-4 py-2"
-        onClick={() => refetchUsers()}
-      >
-        Refetch User
-      </button>
+      <div className="inline-flex gap-2">
+        <button
+          className="bg-blue-700 hover:bg-blue-600 text-white rounded px-4 py-2"
+          onClick={() => refetchUsers()}
+        >
+          Refetch User
+        </button>
+        <button
+          className="bg-green-700 hover:bg-green-600 text-white rounded px-4 py-2"
+          onClick={() => mutate({ count: 1 })}
+        >
+          Add Fake Users
+        </button>
+      </div>
       {users.map((user) => <UserListItem key={user.githubLogin} user={user} />)}
     </div>
   );
