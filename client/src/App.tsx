@@ -86,29 +86,20 @@ const Users = () => {
   );
 };
 
-const ADD_FAKE_USERS_MUTATION = /* GraphQL */ `
-mutation($count: Int!) {
-  addFakeUsers(count: $count) {
-    githubLogin
-    name
-    avatar
-  }
-}
-`;
 const fetchAddFakeUsers = async (variables: AddFakeUsersMutationVariables) => {
   return await fetcher<AddFakeUsersMutation>({
     query: ADD_FAKE_USERS_MUTATION,
     variables,
   });
 };
-
-const makeRefetchQuery = (queryKey: string | string[]) => async () => {
-  await queryClient.refetchQueries({
-    queryKey,
-    active: true,
-    exact: true,
-  });
-};
+const makeQueryRefetcher =
+  (client: QueryClient, queryKey: string | string[]) => async () => {
+    await client.refetchQueries({
+      queryKey,
+      active: true,
+      exact: true,
+    });
+  };
 
 type UserListProps = {
   count: number;
@@ -116,10 +107,11 @@ type UserListProps = {
   refetchUsers: () => void;
 };
 const UserList = ({ count, users, refetchUsers }: UserListProps) => {
+  const client = useQueryClient();
   const { mutate } = useMutation({
     mutationKey: [ADD_FAKE_USERS_MUTATION],
     mutationFn: fetchAddFakeUsers,
-    onSuccess: makeRefetchQuery(ALL_USERS_QUERY),
+    onSuccess: makeQueryRefetcher(client, ALL_USERS_QUERY),
   });
 
   return (
