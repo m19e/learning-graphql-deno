@@ -64,12 +64,6 @@ const ALL_USERS_QUERY = /* GraphQL */ `
     }
   }
 `;
-// type AllUsersData = {
-//   allUsers: {
-//     githubLogin: string;
-//     avatar: string;
-//   }[];
-// };
 
 const fetchAllUsers = async () => {
   return await fetcher<AllUsersData>({ query: ALL_USERS_QUERY });
