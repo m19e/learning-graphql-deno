@@ -19,7 +19,9 @@ fragment userInfo on User {
 export const ADD_FAKE_USERS_MUTATION = /* GraphQL */ `
 mutation($count: Int!) {
   addFakeUsers(count: $count) {
-    ...userInfo
+    githubLogin
+    name
+    avatar
   }
 }
 `;
