@@ -54,7 +54,7 @@ const fetcher = async <T,>(options: Options): Promise<T | undefined> => {
   return res.data;
 };
 
-const allUsersQuery = /* GraphQL */ `
+const ALL_USERS_QUERY = /* GraphQL */ `
   {
     totalUsers
     allUsers {
@@ -72,12 +72,12 @@ const allUsersQuery = /* GraphQL */ `
 // };
 
 const fetchAllUsers = async () => {
-  return await fetcher<AllUsersData>({ query: allUsersQuery });
+  return await fetcher<AllUsersData>({ query: ALL_USERS_QUERY });
 };
 
 const Users = () => {
   const { data, error, refetch } = useQuery({
-    queryKey: [allUsersQuery],
+    queryKey: [ALL_USERS_QUERY],
     queryFn: fetchAllUsers,
   });
 
