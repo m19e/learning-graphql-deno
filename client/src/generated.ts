@@ -94,6 +94,13 @@ export type MutationFakeUserAuthArgs = {
   githubLogin: Scalars["ID"];
 };
 
+export type UserInfoFragment = {
+  __typename?: "User";
+  githubLogin: string;
+  name?: string | null;
+  avatar?: string | null;
+};
+
 export type AllUsersQueryVariables = Exact<{ [key: string]: never }>;
 
 export type AllUsersQuery = {
@@ -107,6 +114,12 @@ export type AllUsersQuery = {
       avatar?: string | null;
     }
   >;
+  me?: {
+    __typename?: "User";
+    githubLogin: string;
+    name?: string | null;
+    avatar?: string | null;
+  } | null;
 };
 
 export type AddFakeUsersMutationVariables = Exact<{
