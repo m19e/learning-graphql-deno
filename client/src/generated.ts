@@ -108,3 +108,19 @@ export type AllUsersQuery = {
     }
   >;
 };
+
+export type AddFakeUsersMutationVariables = Exact<{
+  count: Scalars["Int"];
+}>;
+
+export type AddFakeUsersMutation = {
+  __typename?: "Mutation";
+  addFakeUsers: Array<
+    {
+      __typename?: "User";
+      githubLogin: string;
+      name?: string | null;
+      avatar?: string | null;
+    }
+  >;
+};
