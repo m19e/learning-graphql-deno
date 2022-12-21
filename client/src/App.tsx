@@ -12,6 +12,7 @@ import {
 } from "react-query";
 
 import type { Options, Response, User } from "./types";
+import { ADD_FAKE_USERS_MUTATION, ALL_USERS_QUERY } from "./query";
 import {
   AddFakeUsersMutation,
   AddFakeUsersMutationVariables,
@@ -64,16 +65,6 @@ const fetcher = async <T,>(options: Options): Promise<T | undefined> => {
   return res.data;
 };
 
-const ALL_USERS_QUERY = /* GraphQL */ `
-query {
-  totalUsers
-  allUsers {
-    githubLogin
-    name
-    avatar
-  }
-}
-`;
 const fetchAllUsers = async () => {
   return await fetcher<AllUsersData>({ query: ALL_USERS_QUERY });
 };
