@@ -4,11 +4,20 @@ import "./App.css";
 
 import { Users } from "./Users";
 
-function App() {
+const App = () => {
+  return (
+    <div className="App">
+      {/* <DefaultContent /> */}
+      <Users />
+    </div>
+  );
+};
+
+const DefaultContent = () => {
   const [count, setCount] = useState(0);
 
   return (
-    <div className="App">
+    <>
       <div className="flex">
         <a href="https://vitejs.dev" target="_blank">
           <img src="/vite.svg" className="logo" alt="Vite logo" />
@@ -29,9 +38,8 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
-      <Users />
-    </div>
+    </>
   );
-}
+};
 
 export default App;
