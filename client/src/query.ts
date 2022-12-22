@@ -1,5 +1,5 @@
 export const ALL_USERS_QUERY = /* GraphQL */ `
-query {
+query users {
   totalUsers
   allUsers {
     ...userInfo
@@ -17,7 +17,7 @@ fragment userInfo on User {
 `;
 
 export const ADD_FAKE_USERS_MUTATION = /* GraphQL */ `
-mutation($count: Int!) {
+mutation fakeUsers($count: Int!) {
   addFakeUsers(count: $count) {
     githubLogin
     name
@@ -27,7 +27,7 @@ mutation($count: Int!) {
 `;
 
 export const GITHUB_AUTH_MUTATION = /* GraphQL */ `
-mutation githubAuth($code: String!) {
+mutation auth($code: String!) {
   githubAuth(code: $code) {
     token
   }
