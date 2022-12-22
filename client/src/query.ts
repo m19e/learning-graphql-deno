@@ -25,3 +25,11 @@ mutation($count: Int!) {
   }
 }
 `;
+
+export const GITHUB_AUTH_MUTATION = /* GraphQL */ `
+mutation githubAuth($code: String!) {
+  githubAuth(code: $code) {
+    token
+  }
+}
+`;

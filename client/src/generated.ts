@@ -137,3 +137,12 @@ export type AddFakeUsersMutation = {
     }
   >;
 };
+
+export type GithubAuthMutationVariables = Exact<{
+  code: Scalars["String"];
+}>;
+
+export type GithubAuthMutation = {
+  __typename?: "Mutation";
+  githubAuth: { __typename?: "AuthPayload"; token: string };
+};
