@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { BrowserRouter } from "react-router-dom";
-import reactLogo from "./assets/react.svg";
-import "./App.css";
+import reactLogo from "../assets/react.svg";
+import "../App.css";
 
 import { Users } from "./Users";
 import { AuthorizedUser } from "./AuthorizedUser";
