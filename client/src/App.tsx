@@ -4,8 +4,8 @@ import { BrowserRouter } from "react-router-dom";
 import reactLogo from "./assets/react.svg";
 import "./App.css";
 
-import { Users } from "./Users";
-import { AuthorizedUser } from "./AuthorizedUser";
+import { Users } from "./react-query/Users";
+import { AuthorizedUser } from "./react-query/AuthorizedUser";
 
 const queryClient = new QueryClient();
 
