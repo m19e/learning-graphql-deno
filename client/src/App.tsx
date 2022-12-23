@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { QueryClient, QueryClientProvider } from "react-query";
 import { BrowserRouter } from "react-router-dom";
 import reactLogo from "./assets/react.svg";
 import "./App.css";
@@ -6,14 +7,18 @@ import "./App.css";
 import { Users } from "./Users";
 import { AuthorizedUser } from "./AuthorizedUser";
 
+const queryClient = new QueryClient();
+
 const App = () => (
-  <BrowserRouter>
-    <div>
-      <DefaultContent />
-      <AuthorizedUser />
-      <Users />
-    </div>
-  </BrowserRouter>
+  <QueryClientProvider client={queryClient}>
+    <BrowserRouter>
+      <div>
+        <DefaultContent />
+        <AuthorizedUser />
+        <Users />
+      </div>
+    </BrowserRouter>
+  </QueryClientProvider>
 );
 
 const DefaultContent = () => {
