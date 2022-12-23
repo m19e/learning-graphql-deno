@@ -286,7 +286,7 @@
             "lineWidth": {
               "description": "The width of a line the printer will try to stay under. Note that the printer may exceed this width in certain cases.",
               "type": "number",
-              "default": 80
+              "default": 100
             },
             "indentWidth": {
               "description": "The number of characters for an indent.",
