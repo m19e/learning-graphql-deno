@@ -1,6 +1,5 @@
 import { Provider } from "urql";
 import { BrowserRouter } from "react-router-dom";
-import "../App.css";
 
 import { client } from "./lib/graphql";
 import { Users } from "./Users";
