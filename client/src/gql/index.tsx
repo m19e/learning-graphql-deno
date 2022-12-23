@@ -1,4 +1,5 @@
 import gql from "graphql-tag";
+import * as React from "react";
 import * as Urql from "urql";
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -19,7 +20,8 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  DateTime: Date;
+  DateTime: any;
+  Upload: any;
 };
 
 export type AuthPayload = {
@@ -151,12 +153,12 @@ export type AuthMutation = {
 };
 
 export const UserInfoFragmentDoc = gql`
-    fragment userInfo on User {
+fragment userInfo on User {
   githubLogin
   name
   avatar
 }
-    `;
+`;
 export const UsersDocument = gql`
 query users {
   totalUsers
@@ -167,7 +169,13 @@ query users {
     ...userInfo
   }
 }
-    ${UserInfoFragmentDoc}`;
+${UserInfoFragmentDoc}`;
+
+export const UsersComponent = (
+  props: Omit<Urql.QueryProps<UsersQuery, UsersQueryVariables>, "query"> & {
+    variables?: UsersQueryVariables;
+  },
+) => <Urql.Query {...props} query={UsersDocument} />;
 
 export function useUsersQuery(
   options?: Omit<Urql.UseQueryArgs<UsersQueryVariables>, "query">,
@@ -185,7 +193,16 @@ mutation fakeUsers($count: Int!) {
     avatar
   }
 }
-    `;
+`;
+
+export const FakeUsersComponent = (
+  props:
+    & Omit<
+      Urql.MutationProps<FakeUsersMutation, FakeUsersMutationVariables>,
+      "query"
+    >
+    & { variables?: FakeUsersMutationVariables },
+) => <Urql.Mutation {...props} query={FakeUsersDocument} />;
 
 export function useFakeUsersMutation() {
   return Urql.useMutation<FakeUsersMutation, FakeUsersMutationVariables>(
@@ -198,7 +215,13 @@ mutation auth($code: String!) {
     token
   }
 }
-    `;
+`;
+
+export const AuthComponent = (
+  props:
+    & Omit<Urql.MutationProps<AuthMutation, AuthMutationVariables>, "query">
+    & { variables?: AuthMutationVariables },
+) => <Urql.Mutation {...props} query={AuthDocument} />;
 
 export function useAuthMutation() {
   return Urql.useMutation<AuthMutation, AuthMutationVariables>(AuthDocument);
