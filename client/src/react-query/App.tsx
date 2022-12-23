@@ -4,12 +4,12 @@ import { BrowserRouter } from "react-router-dom";
 import reactLogo from "./assets/react.svg";
 import "./App.css";
 
-import { Users } from "./react-query/Users";
-import { AuthorizedUser } from "./react-query/AuthorizedUser";
+import { Users } from "./Users";
+import { AuthorizedUser } from "./AuthorizedUser";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+export const RQApp = () => (
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
       <div>
@@ -49,5 +49,3 @@ const DefaultContent = () => {
     </div>
   );
 };
-
-export default App;
