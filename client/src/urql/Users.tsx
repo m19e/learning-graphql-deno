@@ -4,11 +4,19 @@ import { Exact, UsersComponent, UsersQuery } from "../gql";
 
 export const Users = () => {
   return (
-    <Suspense fallback={<span>Loading...</span>}>
+    <Suspense fallback={<UsersFallback />}>
       <UsersComponent>
         {(props) => <UsersContent {...props} />}
       </UsersComponent>
     </Suspense>
+  );
+};
+
+const UsersFallback = () => {
+  return (
+    <div>
+      <span>Loading Users...</span>
+    </div>
   );
 };
 
