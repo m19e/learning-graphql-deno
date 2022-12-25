@@ -4,20 +4,20 @@ import { Exact, FakeUsersComponent, UsersComponent, UsersQuery } from "../gql";
 
 export const Users = () => {
   return (
-    <Suspense fallback={<UsersFallback />}>
-      <div className="min-h-screen flex flex-col items-center justify-center">
+    <div className="min-h-screen flex flex-col items-center justify-center">
+      <Suspense fallback={<UsersFallback />}>
         <UsersComponent>
           {(props) => <UsersContent {...props} />}
         </UsersComponent>
-      </div>
-    </Suspense>
+      </Suspense>
+    </div>
   );
 };
 
 const UsersFallback = () => {
   return (
-    <div>
-      <span>Loading Users...</span>
+    <div className="flex items-center p-4 bg-gray-100 rounded-xl">
+      <span className="font-semibold">Loading Users...</span>
     </div>
   );
 };
