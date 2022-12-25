@@ -31,7 +31,7 @@ type UsersProps = QueryState<
 
 const UsersContent = ({ data }: UsersProps) => {
   if (!data) return null;
-  const { totalUsers, allUsers } = data;
+  const { totalUsers, allUsers, me } = data;
   return (
     <div className="flex flex-col items-start gap-4 bg-gray-100 min-w-[24rem] rounded-xl p-4">
       <div className="w-full inline-flex items-center justify-between gap-4 border-b border-gray-400 pb-2">
@@ -68,6 +68,7 @@ const UsersContent = ({ data }: UsersProps) => {
           </span>
         </div>
       ))}
+      <p className="whitespace-pre">{JSON.stringify(me, null, 2)}</p>
     </div>
   );
 };
