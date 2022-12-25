@@ -2,7 +2,7 @@ import ky from "ky";
 import { QueryClient } from "react-query";
 
 import type { Options, Response } from "./types";
-import { ADD_FAKE_USERS_MUTATION, ALL_USERS_QUERY, GITHUB_AUTH_MUTATION } from "./query";
+import { ADD_FAKE_USERS_MUTATION, ALL_USERS_QUERY, GITHUB_AUTH_MUTATION } from "../query";
 import {
   AddFakeUsersMutation,
   AddFakeUsersMutationVariables,

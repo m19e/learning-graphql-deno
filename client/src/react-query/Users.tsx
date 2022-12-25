@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "react-query";
 
 import type { User } from "./types";
-import { ADD_FAKE_USERS_MUTATION, ALL_USERS_QUERY } from "./query";
+import { ADD_FAKE_USERS_MUTATION, ALL_USERS_QUERY } from "../query";
 import { fetchAddFakeUsers, fetchAllUsers, makeQueryRefetcher } from "./fetcher";
 
 export const Users = () => {
