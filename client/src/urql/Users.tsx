@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import type { QueryState } from "urql";
 import { Exact, FakeUsersComponent, UsersComponent, UsersQuery } from "../gql";
 
+import { AuthorizedUser } from "./AuthorizedUser";
 import Svg from "./Svg";
 
 export const Users = () => {
@@ -37,22 +38,25 @@ const UsersContent = ({ data }: UsersProps) => {
   return (
     <div className="flex flex-col items-start gap-4 bg-gray-100 min-w-[24rem] rounded-xl p-4">
       <div className="w-full inline-flex items-center justify-between gap-4 border-b border-gray-400 pb-2">
-        <div className="flex items-center gap-0.5 bg-teal-500 text-white py-1.5 px-2 rounded-lg">
-          <div className="w-6 h-6">
-            <Svg.People />
+        <div className="flex gap-2">
+          <div className="flex items-center gap-0.5 bg-teal-500 text-white py-1.5 px-2 rounded-lg">
+            <div className="w-6 h-6">
+              <Svg.People />
+            </div>
+            <span className="font-semibold text-lg">{totalUsers}</span>
           </div>
-          <span className="font-semibold text-lg">{totalUsers}</span>
+          <FakeUsersComponent>
+            {({ executeMutation }) => (
+              <button
+                className="bg-blue-600 hover:bg-blue-500 text-white rounded px-4 py-2"
+                onClick={() => executeMutation({ count: 1 })}
+              >
+                Add Fake Users
+              </button>
+            )}
+          </FakeUsersComponent>
         </div>
-        <FakeUsersComponent>
-          {({ executeMutation }) => (
-            <button
-              className="bg-blue-600 hover:bg-blue-500 text-white rounded px-4 py-2"
-              onClick={() => executeMutation({ count: 1 })}
-            >
-              Add Fake Users
-            </button>
-          )}
-        </FakeUsersComponent>
+        <AuthorizedUser me={me} />
       </div>
       {allUsers.filter((u) => u.githubLogin !== "m19e").map((user) => (
         <div key={user.githubLogin} className="flex items-center gap-2">
