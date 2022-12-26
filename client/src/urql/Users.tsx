@@ -8,7 +8,7 @@ export const Users = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center">
       <Suspense fallback={<UsersFallback />}>
-        <UsersComponent>
+        <UsersComponent requestPolicy="cache-and-network">
           {(props) => <UsersContent {...props} />}
         </UsersComponent>
       </Suspense>
