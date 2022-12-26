@@ -41,7 +41,7 @@ export const findUserByToken = async (
       },
     },
   });
-  if (errors) {
+  if (errors || data.usersCollection.edges.length !== 1) {
     console.error(errors);
     return null;
   }
