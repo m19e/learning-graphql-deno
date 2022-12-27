@@ -7,8 +7,10 @@ import Svg from "./Svg";
 type UserInfo = UserInfoFragment | null | undefined;
 interface AuthorizedUserProps {
   me: UserInfo;
+  refetchUsers: (token?: string | null) => void;
+  fetchingUsers: boolean;
 }
-export const AuthorizedUser = ({ me }: AuthorizedUserProps) => {
+export const AuthorizedUser = ({ me, refetchUsers, fetchingUsers }: AuthorizedUserProps) => {
   const navigate = useNavigate();
   const [githubCode, setGitHubCode] = useState("");
   const [isSignIn, setIsSignIn] = useState(false);
@@ -18,7 +20,9 @@ export const AuthorizedUser = ({ me }: AuthorizedUserProps) => {
   const login = async (code: string) => {
     const { data } = await authMutate({ code });
     if (data) {
-      localStorage.setItem("token", data.githubAuth.token);
+      const { token } = data.githubAuth;
+      localStorage.setItem("token", token);
+      refetchUsers(token);
     }
     navigate("/");
     setIsSignIn(false);
@@ -40,9 +44,18 @@ export const AuthorizedUser = ({ me }: AuthorizedUserProps) => {
 
   const logout = () => {
     localStorage.removeItem("token");
+    refetchUsers();
   };
 
-  return <Me me={me} logout={logout} requestCode={requestCode} isSignIn={isSignIn} />;
+  return (
+    <Me
+      me={me}
+      logout={logout}
+      requestCode={requestCode}
+      isSignIn={isSignIn}
+      fetching={fetchingUsers}
+    />
+  );
 };
 
 interface MeProps {
@@ -50,27 +63,28 @@ interface MeProps {
   logout: () => void;
   requestCode: () => void;
   isSignIn: boolean;
+  fetching: boolean;
 }
 
-const Me = ({ me, logout, requestCode, isSignIn }: MeProps) => {
-  if (me !== null) {
-    return <CurrentUser {...me} logout={logout} />;
+const Me = ({ me, logout, requestCode, isSignIn, fetching }: MeProps) => {
+  if (me === null || fetching) {
+    return (
+      <button
+        onClick={requestCode}
+        disabled={isSignIn}
+        className="flex gap-2 items-center bg-gray-800 p-2 text-white rounded"
+      >
+        <div className="w-6 h-6">
+          <Svg.Github />
+        </div>
+        <span className="text-sm">
+          Sign In with GitHub
+        </span>
+      </button>
+    );
   }
 
-  return (
-    <button
-      onClick={requestCode}
-      disabled={isSignIn}
-      className="flex gap-2 items-center bg-gray-800 p-2 text-white"
-    >
-      <div className="w-6 h-6">
-        <Svg.Github />
-      </div>
-      <span>
-        Sign In with GitHub
-      </span>
-    </button>
-  );
+  return <CurrentUser {...me} logout={logout} />;
 };
 
 interface CurrentUserProps {
@@ -79,17 +93,18 @@ interface CurrentUserProps {
   logout: () => void;
 }
 
-const CurrentUser = ({ name, avatar, logout }: CurrentUserProps) => {
+const CurrentUser = ({ avatar, logout }: CurrentUserProps) => {
   return (
-    <div>
-      <h1>{name}</h1>
+    <div className="flex items-center gap-1">
       <img
-        src={avatar || "https://placehold.jp/48x48.png"}
-        width={48}
-        height={48}
+        src={avatar || "https://placehold.jp/40x40.png"}
+        width={40}
+        height={40}
         alt="me avatar"
       />
-      <button onClick={logout}>logout</button>
+      <button onClick={logout} className="bg-gray-700 p-2 text-gray-200 rounded">
+        <span className="text-sm">Logout</span>
+      </button>
     </div>
   );
 };

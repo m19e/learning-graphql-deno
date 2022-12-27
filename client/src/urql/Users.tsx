@@ -32,7 +32,7 @@ type UsersProps = QueryState<
   }>
 >;
 
-const UsersContent = ({ data }: UsersProps) => {
+const UsersContent = ({ data, executeQuery, fetching }: UsersProps) => {
   if (!data) return null;
   const { totalUsers, allUsers, me } = data;
   return (
@@ -56,7 +56,20 @@ const UsersContent = ({ data }: UsersProps) => {
             )}
           </FakeUsersComponent>
         </div>
-        <AuthorizedUser me={me} />
+        <AuthorizedUser
+          me={me}
+          refetchUsers={(token = null) =>
+            executeQuery({
+              fetchOptions: () => {
+                return {
+                  headers: {
+                    authorization: token!,
+                  },
+                };
+              },
+            })}
+          fetchingUsers={fetching}
+        />
       </div>
       {allUsers.filter((u) => u.githubLogin !== "m19e").map((user) => (
         <div key={user.githubLogin} className="flex items-center gap-2">
@@ -69,7 +82,7 @@ const UsersContent = ({ data }: UsersProps) => {
           </span>
         </div>
       ))}
-      <p className="whitespace-pre">{JSON.stringify(me, null, 2)}</p>
+      {/* <p className="whitespace-pre">{JSON.stringify(me, null, 2)}</p> */}
     </div>
   );
 };
