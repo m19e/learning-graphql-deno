@@ -12,7 +12,6 @@ interface AuthorizedUserProps {
 }
 export const AuthorizedUser = ({ me, refetchUsers, fetchingUsers }: AuthorizedUserProps) => {
   const navigate = useNavigate();
-  const [githubCode, setGitHubCode] = useState("");
   const [isSignIn, setIsSignIn] = useState(false);
 
   const [, authMutate] = useAuthMutation();
@@ -34,7 +33,7 @@ export const AuthorizedUser = ({ me, refetchUsers, fetchingUsers }: AuthorizedUs
       const code = window.location.search.replace("?code=", "");
       login(code);
     }
-  }, [githubCode]);
+  }, []);
 
   const requestCode = () => {
     const clientID = import.meta.env.VITE_CLIENT_ID;
@@ -100,7 +99,7 @@ const CurrentUser = ({ avatar, logout }: CurrentUserProps) => {
         src={avatar || "https://placehold.jp/40x40.png"}
         width={40}
         height={40}
-        alt="me avatar"
+        alt="me { avatar }"
       />
       <button onClick={logout} className="bg-gray-700 p-2 text-gray-200 rounded">
         <span className="text-sm">Logout</span>
