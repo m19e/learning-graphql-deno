@@ -46,10 +46,10 @@ type Collection<T> = {
 };
 
 type UserNode = {
-  id: number;
-  name: string;
   github_login: string;
   github_token: string;
+  name: string;
+  avatar: string;
 };
 type UsersCollection = Collection<UserNode>;
 type UsersData = {
@@ -59,7 +59,7 @@ type UsersData = {
 type PhotoNode = {
   id: number;
   name: string;
-  desciption?: string;
+  desciption: string | null;
   category: PhotoCategory;
   github_user: string;
   created: string;

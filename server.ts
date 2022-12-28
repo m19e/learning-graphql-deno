@@ -1,4 +1,4 @@
-import { Application, applyGraphQL, Router } from "./deps.ts";
+import { Application, applyGraphQL, oakCors, Router } from "./deps.ts";
 
 import { resolvers } from "./graphql/resolvers.ts";
 import { context } from "./graphql/context.ts";
@@ -29,14 +29,14 @@ const GraphQLService = await applyGraphQL<Router>({
   typeDefs,
   resolvers,
   context,
-  path: "/playground",
 });
 
+app.use(oakCors());
 app.use(
   router.routes(),
   GraphQLService.routes(),
   GraphQLService.allowedMethods(),
 );
 
-console.log("Server start at http://localhost:4000");
+console.log(`Server start at http://localhost:4000`);
 await app.listen({ port: 4000 });

@@ -1,0 +1,12 @@
+overwrite: true
+schema: "http://localhost:4000/graphql"
+documents: "./src/query.ts"
+generates:
+  ./src/gql/index.tsx:
+    config:
+      withHooks: true
+      withComponent: true
+    plugins: 
+      - typescript
+      - typescript-operations 
+      - typescript-urql

@@ -1,10 +1,11 @@
-import { GQLError } from "../deps.ts";
+import { GQLError, ky } from "../deps.ts";
 
 import type {
   AuthPayload,
   Ctx,
   Photo,
   PhotoInput,
+  Response,
   User,
   UserRecord,
 } from "../types.ts";
@@ -12,11 +13,11 @@ import { CLIENT_ID, CLIENT_SECRET } from "../env.ts";
 import { convertRecordToUser, convertUserToRecord } from "../utils.ts";
 import { authorizeWithGitHub } from "../lib/github.ts";
 import { postWithHeaders } from "../lib/request.ts";
+import { findUserByLogin } from "../lib/query.ts";
 
 type UpdateUserResponse = {
   data: {
     updateusersCollection: {
-      affectedCount: number;
       records: UserRecord[];
     };
   };
@@ -24,7 +25,6 @@ type UpdateUserResponse = {
 const updateUserMutation = /* GraphQL */ `
 mutation ($set: usersUpdateInput!, $filter: usersFilter) {
   updateusersCollection(set: $set, filter: $filter) {
-    affectedCount
     records {
       github_login
       github_token
@@ -53,18 +53,14 @@ const postUpdateUser = async (
   return updatedUser || null;
 };
 
-type CreateUserResponse = {
-  data: {
-    insertIntousersCollection: {
-      affectedCount: number;
-      records: UserRecord[];
-    };
+type CreateUserResponse = Response<{
+  insertIntousersCollection: {
+    records: UserRecord[];
   };
-};
+}>;
 const createUserMutation = /* GraphQL */ `
 mutation ($objects: [usersInsertInput!]!) {
   insertIntousersCollection(objects: $objects) {
-    affectedCount
     records {
       github_login
       github_token
@@ -75,12 +71,16 @@ mutation ($objects: [usersInsertInput!]!) {
 }
 `;
 const postCreateUser = async (newUser: User): Promise<UserRecord> => {
-  const { data } = await postWithHeaders<CreateUserResponse>({
+  const { data, errors } = await postWithHeaders<CreateUserResponse>({
     query: createUserMutation,
     variables: {
       objects: convertUserToRecord(newUser),
     },
   });
+  if (errors) {
+    console.error(errors);
+    throw new GQLError(`create user error`);
+  }
   const [createdUser] = data.insertIntousersCollection.records;
   return createdUser;
 };
@@ -131,9 +131,107 @@ const postCreatePhoto = async (
   return record;
 };
 
+type FakeUsersResponse = {
+  results: {
+    login: {
+      sha1: string;
+    };
+    picture: {
+      thumbnail: string;
+    };
+  }[];
+};
+
+const fakeUserNames = [
+  "Rio Tsukatsuki",
+  "Himari Akeboshi",
+  "Noa Ushio",
+  "Yuuka Hayase",
+  "Koyuki Kurosaki",
+  "Momoi Saiba",
+  // "Midori Saiba",
+  "Yuzu Hanaoka",
+  "Arisu Tendou",
+  "Neru Mikamo",
+  "Karin Kakudate",
+  "Akane Murokasa",
+  "Asuna Ichinose",
+  "Toki Asuma",
+  "Hibiki Nekozuka",
+  "Utaha Shiraishi",
+  "Kotori Toyomi",
+] as const;
+const fakeUsers: Omit<User, "githubToken" | "avatar">[] = fakeUserNames.map(
+  (name) => {
+    const [first, last] = name.split(" ");
+    const login = [...first][0].toLowerCase() + last;
+    return { githubLogin: login, name };
+  },
+);
+
+const postCreateUsers = async (newUsers: User[]): Promise<User[]> => {
+  const { data, errors } = await postWithHeaders<CreateUserResponse>({
+    query: createUserMutation,
+    variables: {
+      objects: newUsers.map(convertUserToRecord),
+    },
+  });
+  if (errors) {
+    console.error(errors);
+    throw new GQLError(`create user error`);
+  }
+  const users = data.insertIntousersCollection.records.map(convertRecordToUser);
+  return users;
+};
+let addedCount = 0;
+const addFakeUsers: MutationResolver["addFakeUsers"] = async (_, { count }) => {
+  const currentCount = addedCount + count;
+  if (fakeUsers.length < currentCount) {
+    throw new GQLError(`out of range: fake-users`);
+  }
+
+  const { results } = await ky.get(
+    `https://randomuser.me/api/?results=${count}`,
+  ).json<FakeUsersResponse>();
+
+  const users = results.map((r, i) => {
+    const index = addedCount + i;
+    return ({
+      githubLogin: fakeUsers[index].githubLogin,
+      githubToken: r.login.sha1,
+      name: fakeUsers[index].name,
+      avatar: r.picture.thumbnail,
+    });
+  });
+
+  addedCount = currentCount;
+  await postCreateUsers(users);
+
+  return users;
+};
+
+const fakeUserAuth: MutationResolver["fakeUserAuth"] = async (
+  _,
+  { githubLogin },
+) => {
+  const user = await findUserByLogin(githubLogin);
+  if (!user) {
+    throw new GQLError(`Cannot find user with githubLogin "${githubLogin}"`);
+  }
+  return {
+    token: user.githubToken,
+    user,
+  };
+};
+
 export type MutationResolver = {
   postPhoto: (_: null, args: PhotoInput, ctx: Ctx) => Promise<Photo>;
   githubAuth: (_: null, args: { code: string }) => Promise<AuthPayload>;
+  addFakeUsers: (_: null, args: { count: number }) => Promise<User[]>;
+  fakeUserAuth: (
+    _: null,
+    args: { githubLogin: string },
+  ) => Promise<AuthPayload>;
 };
 
 export const Mutation: MutationResolver = {
@@ -182,4 +280,6 @@ export const Mutation: MutationResolver = {
       };
     }
   },
+  addFakeUsers,
+  fakeUserAuth,
 };

@@ -9,13 +9,15 @@ import type {
 } from "../types.ts";
 import { Mutation, MutationResolver } from "./mutation.ts";
 import { postWithHeaders } from "../lib/request.ts";
+import { convertRecordToUser } from "../utils.ts";
 
 import { photos, tags, users } from "../mocks.ts";
 
 type Resolvers = {
   Photo: {
+    id: (parent: Photo) => Photo["id"];
     url: (parent: Photo) => string;
-    postedBy: (parent: Photo) => User | undefined;
+    postedBy: (parent: Photo) => Promise<User | null>;
     taggedUsers: (parent: Photo) => (User | undefined)[];
   };
   User: {
@@ -38,52 +40,85 @@ type Resolvers = {
 };
 
 const allUsersQuery = /* GraphQL */ `
-  query {
-    usersCollection {
-      edges {
-        node {
-          id
-          name
-          github_login
-        }
+{
+  usersCollection {
+    edges {
+      node {
+        github_login
+        github_token
+        name
+        avatar
       }
     }
   }
-  `;
+}
+`;
 const fetchAllUsers = async (): Promise<UsersResponse> => {
   return await postWithHeaders<UsersResponse>({ query: allUsersQuery });
 };
 
 const allPhotosQuery = /* GraphQL */ `
-  {
-    photosCollection {
-      edges {
-        node {
-          id
-          name
-          description
-          category
-          created
-          github_user
-        }
+{
+  photosCollection {
+    edges {
+      node {
+        id
+        name
+        description
+        category
+        created
+        github_user
       }
     }
   }
-  `;
+}
+`;
 const fetchAllPhotos = async (): Promise<PhotosResponse> => {
   return await postWithHeaders<PhotosResponse>({ query: allPhotosQuery });
 };
 
+const postedByQuery = /* GraphQL */ `
+query ($filter: usersFilter) {
+  usersCollection(filter: $filter) {
+    edges {
+      node {
+        github_login
+        github_token
+        name
+        avatar
+      }
+    }
+  }
+}
+`;
+
 export const resolvers: Resolvers = {
   Photo: {
-    url: (parent: Photo) => {
-      return `https://mysite.com/assets/img/${parent.id}.png`;
+    id: (parent: Photo) => {
+      return parent.id;
     },
-    postedBy: (parent: Photo) => {
-      return users.find((u) => u.githubLogin === parent.githubUser);
+    url: (parent: Photo) => {
+      return `/img/photos/${parent.id}.jpg`;
+    },
+    postedBy: async (parent: Photo) => {
+      const { data, errors } = await postWithHeaders<UsersResponse>({
+        query: postedByQuery,
+        variables: {
+          filter: {
+            github_login: {
+              eq: parent.githubUser,
+            },
+          },
+        },
+      });
+      if (errors) {
+        console.error(errors);
+        return null;
+      }
+      return convertRecordToUser(data.usersCollection.edges[0].node);
     },
     taggedUsers: (parent: Photo) => {
-      return tags.filter((tag) => tag.photoID === parent.id).map((
+      return tags.filter((tag) => tag.photoID === String(parent.id)).map((
         { userID },
       ) => users.find((u) => u.githubLogin === userID));
     },
@@ -95,7 +130,7 @@ export const resolvers: Resolvers = {
     inPhotos: (parent: User) => {
       return tags.filter((tag) => tag.userID === parent.githubLogin).map((
         { photoID },
-      ) => photos.find((p) => p.id === photoID));
+      ) => photos.find((p) => String(p.id) === photoID));
     },
   },
   Query: {
@@ -116,12 +151,11 @@ export const resolvers: Resolvers = {
         return [];
       }
       const { edges } = data.photosCollection;
-      const photoList = edges.map(({ node }) => {
-        const { id, github_user, ...other } = node;
+      const photoList: Photo[] = edges.map(({ node }) => {
+        const { github_user, ...other } = node;
         return {
-          id: String(id),
-          githubUser: github_user,
           ...other,
+          githubUser: github_user,
         };
       });
       return photoList;
@@ -143,12 +177,7 @@ export const resolvers: Resolvers = {
       }
       const userList: User[] = data.usersCollection.edges.map((
         { node },
-      ) => ({
-        githubLogin: node.github_login,
-        githubToken: node.github_token,
-        name: node.name,
-        avatar: null,
-      }));
+      ) => convertRecordToUser(node));
       return userList;
     },
   },
